@@ -1,0 +1,126 @@
+name: REG.RU — проверка и публикация
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/reg-ru.yml]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Опубликовать сайт (без галочки — только проверка подключения)'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reg-ru-studio
+  cancel-in-progress: false
+
+jobs:
+  hosting:
+    name: Проверить или опубликовать
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      HOST: 37.140.192.52
+      HOST_USER: u3671990
+      HOST_FINGERPRINT: SHA256:o4j9KqVohji4n1Lx/0+Ao+4B9tqGd3O8VwRCpPFcHaA
+      SITE_DIR: /var/www/u3671990/data/www/tarusovphotographer.online
+    steps:
+      - name: Получить файлы из GitHub
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Подготовить защищённое подключение
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SSH_PRIVATE_KEY" || { echo 'Добавьте секрет REG_SSH_KEY в настройках репозитория'; exit 1; }
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/reg_studio_key"
+          ssh-keygen -y -P '' -f "$HOME/.ssh/reg_studio_key" > /dev/null
+          ssh-keyscan -T 20 -p 22 -t ed25519 "$HOST" > "$HOME/.ssh/reg_scan" 2>/dev/null
+          actual=$(ssh-keygen -lf "$HOME/.ssh/reg_scan" -E sha256 | awk '{print $2}' | sort -u)
+          test "$actual" = "$HOST_FINGERPRINT" || { echo 'Отпечаток сервера отличается от подтверждённого REG.RU'; exit 1; }
+          cp "$HOME/.ssh/reg_scan" "$HOME/.ssh/reg_known_hosts"
+          cat > "$HOME/.ssh/config" <<EOF
+          Host reg-studio
+            HostName $HOST
+            User $HOST_USER
+            Port 22
+            IdentityFile $HOME/.ssh/reg_studio_key
+            UserKnownHostsFile $HOME/.ssh/reg_known_hosts
+            StrictHostKeyChecking yes
+            IdentitiesOnly yes
+            BatchMode yes
+            ConnectTimeout 20
+          EOF
+
+      - name: Проверить доступ и папку сайта без изменений
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -T reg-studio 'set -eu
+            target=/var/www/u3671990/data/www/tarusovphotographer.online
+            test "$(realpath "$target")" = "$target"
+            test -f "$target/index.html"
+            test -d "$target/src"
+            test -w "$target"
+            command -v rsync >/dev/null
+            command -v tar >/dev/null
+            command -v sha256sum >/dev/null
+            printf "Подключение работает. Папка сайта проверена.\n"'
+          echo '### Проверка подключения успешна' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Подготовить файлы для публикации
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main || { echo 'Публикация разрешена только из main'; exit 1; }
+          mkdir -p "$RUNNER_TEMP/site"
+          for file in .htaccess index.html manifest.json sw.js icon-192.png icon-512.png; do
+            test -f "$file"
+            cp "$file" "$RUNNER_TEMP/site/"
+          done
+          cp -R src "$RUNNER_TEMP/site/src"
+          test -z "$(find "$RUNNER_TEMP/site" -type l -print)" || { echo 'В файлах сайта обнаружены символические ссылки'; exit 1; }
+          (cd "$RUNNER_TEMP/site" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUNNER_TEMP/site-sha256.txt"
+
+      - name: Создать резервную копию на хостинге
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -T reg-studio 'set -eu
+            umask 077
+            target=/var/www/u3671990/data/www/tarusovphotographer.online
+            test "$(realpath "$target")" = "$target"
+            mkdir -p "$HOME/.studio-backups"
+            backup="$HOME/.studio-backups/studio-$(date -u +%Y%m%dT%H%M%S)-$$.tar.gz"
+            tar -czf "$backup" -C "$target" .
+            printf "Резервная копия: %s\n" "$backup"'
+
+      - name: Загрузить обновления и проверить файлы
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -rc --delay-updates --chmod=D755,F644 -e ssh "$RUNNER_TEMP/site/" "reg-studio:$SITE_DIR/"
+          ssh -T reg-studio 'cd /var/www/u3671990/data/www/tarusovphotographer.online && sha256sum -c -' < "$RUNNER_TEMP/site-sha256.txt"
+          echo '### Сайт опубликован' >> "$GITHUB_STEP_SUMMARY"
+          echo "Версия: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Адрес: https://tarusovphotographer.online/' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Удалить временный ключ
+        if: always()
+        shell: bash
+        run: rm -f "$HOME/.ssh/reg_studio_key"
+
