@@ -1,6 +1,6 @@
-import {seconds,timecode,timingLabel} from './scene-timing.js?v=20261008-topic-only7';
-import {escape as e,field,button as b,badge} from './ui.js?v=20261008-topic-only7';
-import {plannerState} from './planner-model.js?v=20261008-topic-only7';
+import {seconds,timecode,timingLabel} from './scene-timing.js?v=20261008-single-plan8';
+import {escape as e,field,button as b,badge} from './ui.js?v=20261008-single-plan8';
+import {plannerState} from './planner-model.js?v=20261008-single-plan8';
 export const shotStatuses=['Запланирован','Снято','Переснять'];
 export const shotStatus=x=>shotStatuses.includes(x.status)?x.status:x.filmed?'Снято':'Запланирован';
 export function newShot(id){return {id,title:'',shots:'',plan:'',timeStart:'',timeEnd:'',speech:'',voiceOver:'',broll:'',overlay:'',audio:'',stage:'',status:'Запланирован',date:'',deadline:'',workIds:[],filmed:false,beforeWork:false,beforeNote:'',storyboardFileId:''};}
@@ -21,4 +21,3 @@ export function projectBoards(s,u){
 }
 
 export function scriptBoards(s,t){return '<section class="inline-storyboard"><div class="inline-board-heading"><h4>Сцены и раскадровка <span>'+t.scenes.length+' кадров</span></h4>'+b('board-template','Составить раскадровку','data-topic="'+e(t.id)+'"')+b('board-add','＋ Добавить кадр','data-topic="'+e(t.id)+'"')+'</div><p class="small-note">Ориентировочный хронометраж: '+timecode(Math.max(0,...t.scenes.map(x=>seconds(x.timeEnd)||0)))+'. Реплики — черновик для проверки.</p>'+t.scenes.map((x,i)=>'<article class="inline-board-row"><div class="shot-order"><span>'+String(i+1).padStart(2,'0')+'</span>'+b('board-move','↑','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'" data-direction="-1" '+(!i?'disabled':'')+' aria-label="Кадр выше"')+b('board-move','↓','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'" data-direction="1" '+(i===t.scenes.length-1?'disabled':'')+' aria-label="Кадр ниже"')+'</div><div class="inline-board-content"><details open><summary><strong>'+e(x.title)+'</strong><small>'+e([timingLabel(x),x.plan,x.stage,dates(x)].filter(Boolean).join(' · '))+'</small></summary>'+sceneBreakdown(x)+shotImage(s,x)+'</details>'+(x.beforeWork&&shotStatus(x)!=='Снято'?'<p class="urgent">Снять до работы: '+e(x.beforeNote||'причина не указана')+'</p>':'')+'<div class="inline-board-actions">'+badge(shotStatus(x),shotStatus(x)==='Снято'?'#28745b':'#7561df')+b('scene-duration','Длительность','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'"')+b('board-edit','Изменить','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'"')+b('board-status',shotStatus(x)==='Снято'?'Переснять':'Снято','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'" data-status="'+(shotStatus(x)==='Снято'?'Переснять':'Снято')+'"')+b('board-delete','Удалить','data-topic="'+e(t.id)+'" data-id="'+e(x.id)+'"','subtle')+'</div></div></article>').join('')+(!t.scenes.length?'<p class="group-empty">Кадров пока нет. Добавьте первый кадр — что показать, действие и план.</p>':'')+'</section>';}
-

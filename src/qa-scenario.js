@@ -1,8 +1,8 @@
-import {escape as e,field,button as b} from './ui.js?v=20261008-topic-only7';
-import {platforms,plannerState,validDate} from './planner-model.js?v=20261008-topic-only7';
-import {speakers,appendPlan} from './scenario-plan.js?v=20261008-topic-only7';
-import {uid} from './model.js?v=20261008-topic-only7';
-import {timecode,validateSequence,timingLabel} from './scene-timing.js?v=20261008-topic-only7';
+import {escape as e,field,button as b} from './ui.js?v=20261008-single-plan8';
+import {platforms,plannerState,validDate} from './planner-model.js?v=20261008-single-plan8';
+import {speakers,appendPlan} from './scenario-plan.js?v=20261008-single-plan8';
+import {uid} from './model.js?v=20261008-single-plan8';
+import {timecode,validateSequence,timingLabel} from './scene-timing.js?v=20261008-single-plan8';
 
 export const questionTitles=['О чём видео и зачем?','Где выйдет материал?','Что известно о работе?','Для кого это видео?','Что можно показать?','Кто будет говорить?','Какой длины и в каком тоне?','Чем завершить видео?','Проверка перед генерацией'];
 export function initializeQuestions(t){
@@ -60,4 +60,3 @@ export function questionView(s,u){
  if(u.aiResult){const result=u.aiResult;body+='<section class="qa-result"><h3>Предпросмотр · результат ещё не сохранён</h3><label class="field">Текст сценария<textarea data-ai-result-script>'+e(result.script)+'</textarea></label>'+(result.clarifications?.length?'<p class="qa-error">Уточнить: '+e(result.clarifications.join(' · '))+'</p>':'')+result.scenes.map((x,i)=>'<article class="qa-scene"><strong>'+(i+1)+'. '+e(timecode(x.startSeconds))+' — '+e(timecode(x.endSeconds))+' · '+(x.endSeconds-x.startSeconds)+' сек.</strong><p>'+e(x.title)+' · '+e(x.plan)+'</p><p>'+e(x.action)+'</p><p>'+e(x.speech||x.voiceOver||'Без речи')+'</p></article>').join('')+(t.script?.trim()||t.scenes.length?field('qa-applyMode','Как применить к существующему сценарию?',a.applyMode||'','text',[['','Выберите действие'],['append','Добавить после существующего текста и сцен'],['replace','Заменить общий текст и сцены']]):'')+b('qa-accept','Принять в черновик','','primary')+'<p class="small-note">После принятия можно поправить сцены и текст. Для записи нажмите «Сохранить материал».</p></section>';}
  return '<form id="topic-form" class="topic-editor spacious-editor tabbed-editor qa-editor"><header><div><span class="small-note">'+e(s.projects.find(x=>x.id===t.projId)?.name||'Проект')+' / '+e(t.title||'Новый сценарий')+'</span><h2>'+questionTitles[step]+'</h2></div>'+b('wizard-close','К редактору')+'</header><p class="qa-progress">Шаг '+(step+1)+' из '+questionTitles.length+' · ответы остаются в черновике</p><div class="editor-body"><section class="tabbed-panel">'+body+'</section></div><footer><span class="save-note">'+(u.aiLoading?'Ожидаем ответ OpenAI':u.dirty?'Есть несохранённые вводные':'Сначала вводные, затем AI и проверка')+'</span>'+b('qa-save-brief','Сохранить вводные',u.aiLoading?'disabled':'')+b(step?'qa-back':'wizard-close',step?'Назад':'К редактору',u.aiLoading?'disabled':'')+(step<8?b('qa-next','Далее','','primary'):'')+'</footer></form>';
 }
-

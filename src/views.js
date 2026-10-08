@@ -1,7 +1,7 @@
-import {icon,brand} from './icons.js?v=20261008-topic-only7';
-import {generalShoots,projectColor,projectName} from './project-colors.js?v=20261008-topic-only7';
-import {dateKey} from './model.js?v=20261008-topic-only7';
-import {escape as e,money,pretty,button as b,empty,badge,link} from './ui.js?v=20261008-topic-only7';
+import {icon,brand} from './icons.js?v=20261008-single-plan8';
+import {generalShoots,projectColor,projectName} from './project-colors.js?v=20261008-single-plan8';
+import {dateKey} from './model.js?v=20261008-single-plan8';
+import {escape as e,money,pretty,button as b,empty,badge,link} from './ui.js?v=20261008-single-plan8';
 export const sections=[['home','◈','Главная'],['cal','▦','Календарь'],['content','▤','Контент-план'],['tasks','✓','Задачи'],['gear','▣','Снаряжение'],['portfolio','▧','Портфолио'],['account','◎','Аккаунт'],['settings','⚙','Настройки']];
 const edit=(type,id)=>b('edit','Изменить','data-type="'+type+'" data-id="'+e(id)+'"')+b('delete','×','data-type="'+type+'" data-id="'+e(id)+'" aria-label="Удалить"','danger');
 const add=(type,text='Добавить')=>b('add','＋ '+text,'data-type="'+type+'"','primary');
@@ -86,4 +86,3 @@ export function settings(s){
 }
 
 const navIcon=key=>icon(key);
-

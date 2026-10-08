@@ -1,6 +1,6 @@
-import {content as legacy,monthGrid} from './views.js?v=20261008-topic-only7';
-import {escape as e,button as b,pretty,badge,empty} from './ui.js?v=20261008-topic-only7';
-import {weekHtml} from './planning.js?v=20261008-topic-only7';
+import {content as legacy,monthGrid} from './views.js?v=20261008-single-plan8';
+import {escape as e,button as b,pretty,badge,empty} from './ui.js?v=20261008-single-plan8';
+import {weekHtml} from './planning.js?v=20261008-single-plan8';
 
 export const platforms=s=>[...s.socials,...['Instagram','Telegram','VK'].filter(name=>!s.socials.some(x=>x.name.toLowerCase()===name.toLowerCase())).map(name=>({id:'platform:'+name,name}))];
 export function selectedPosts(s,u){return s.posts.filter(x=>x.projId===u.projId&&(!u.postSocial||x.social===u.postSocial)&&(x.title+' '+(x.text||'')).toLowerCase().includes(u.query.toLowerCase())&&(!u.postStatus||x.status===u.postStatus)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));}
@@ -14,10 +14,8 @@ function contextPanel(s,u,projects,p){
 }
 function scripts(s,rows){return ['ready','missing'].map(group=>{const list=rows.filter(x=>Boolean(x.text?.trim())===(group==='ready'));return '<section class="cp-script-group"><h2>'+(group==='ready'?'Со сценарием':'Без сценария')+' <span class="cp-count">'+list.length+'</span></h2>'+(list.length?list.map(x=>'<article class="cp-script '+group+'"><div class="cp-script-head"><h3>'+e(x.title)+'</h3>'+edit(x)+'</div>'+meta(s,x)+connections(s,x)+(group==='ready'?'<pre class="cp-script-text">'+e(x.text)+'</pre><div class="cp-card-actions">'+b('copy-script','Копировать текст','data-id="'+e(x.id)+'"','primary')+'</div>':'<p class="muted">'+(x.format==='video'?'Добавьте план видео.':'Добавьте текст публикации.')+'</p>'+b('edit','Добавить сценарий','data-type="posts" data-id="'+e(x.id)+'"','primary'))+'</article>').join(''):'<p class="cp-group-empty">'+(group==='ready'?'Здесь появятся публикации с текстом.':'У всех выбранных публикаций есть сценарий.')+'</p>')+'</section>';}).join('');}
 export function content(s,u){
- const toggle='<div class="cp-view-switch" aria-label="Оформление контент-плана">'+[['new','Новый вид'],['old','Старый вид']].map(([v,t])=>b('content-view',t,'data-view="'+v+'" aria-pressed="'+(u.contentView===v)+'"',u.contentView===v?'active':'')).join('')+'</div>';
- if(u.contentView==='old')return '<p><a href="./planner.html">Открыть новый план</a></p>'+toggle+(s.projects.some(x=>x.id===u.projId)?weekHtml(s,u):'')+legacy(s,{...u,postTab:u.postTab==='scripts'?'table':u.postTab});
  const projects=s.projects.filter(x=>x.orgId===u.orgId&&Boolean(x.archived)===u.archive),p=projects.find(x=>x.id===u.projId),rows=selectedPosts(s,u);
- let h='<p><a href="./planner.html">Открыть новый план</a></p><div class="cp-top">'+toggle+b('add','＋ Добавить публикацию','data-type="posts" '+(!p?'disabled':''),'primary')+'</div>'+contextPanel(s,u,projects,p);
+ let h='<div class="cp-top">'+b('add','＋ Добавить публикацию','data-type="posts" '+(!p?'disabled':''),'primary')+'</div>'+contextPanel(s,u,projects,p);
  if(!p)return h+'<section class="card cp-context-empty">'+empty(!u.orgId?'Выберите или создайте организацию':u.archive?'Выберите проект из архива':'Выберите или создайте проект','Публикации, сценарии и вложения будут собраны в одном проекте.')+(u.orgId?b('add','＋ Создать проект','data-type="projects"','primary'):b('add','＋ Создать организацию','data-type="orgs"','primary'))+'</section>';
  h+=weekHtml(s,u);
  h+='<div class="cp-platforms" aria-label="Площадки">'+b('content-social','Все площадки','data-social="" aria-pressed="'+(!u.postSocial)+'"',!u.postSocial?'active':'')+platforms(s).map(x=>b('content-social',e(x.name)+' <span class="cp-count">'+s.posts.filter(v=>v.projId===p.id&&v.social===x.id).length+'</span>','data-social="'+e(x.id)+'" aria-pressed="'+(u.postSocial===x.id)+'"',u.postSocial===x.id?'active':'')).join('')+'</div><div class="cp-modes" aria-label="Режим публикаций">'+[['cal','▦','Календарь'],['table','▤','Таблица'],['scripts','▧','Сценарии']].map(([v,i,t])=>b('post-tab','<span aria-hidden="true">'+i+'</span> '+t,'data-tab="'+v+'" aria-pressed="'+(u.postTab===v)+'"',u.postTab===v?'active':'')).join('')+'</div><div class="cp-filters"><input data-control="query" value="'+e(u.query)+'" placeholder="Найти публикацию…" aria-label="Поиск публикаций"><select data-control="postStatus" aria-label="Статус"><option value="">Все статусы</option>'+s.statuses.map(x=>'<option value="'+e(x.id)+'" '+(x.id===u.postStatus?'selected':'')+'>'+e(x.name)+'</option>').join('')+'</select><span class="muted">Публикаций: '+rows.length+'</span></div>';
@@ -28,4 +26,3 @@ export function content(s,u){
  if(['links','files'].includes(u.postTab)){const old=legacy(s,u);h+=old.slice(old.indexOf(u.postTab==='links'?'<section class="card"><div class="card-header"><h2>Ссылки проекта':'<section class="card"><div class="card-header"><h2>Файлы проекта'));}
  return h;
 }
-

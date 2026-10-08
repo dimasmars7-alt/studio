@@ -1,4 +1,4 @@
-import {icon} from './icons.js?v=20261008-topic-only7';
+import {icon} from './icons.js?v=20261008-single-plan8';
 export const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const money=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(Number(n)||0);
 export const pretty=d=>d?new Date(d+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'}):'Без даты';
@@ -28,4 +28,3 @@ export function openDialog(title,body,onSubmit,wide=false){
 }
 
 function decorate(label){const m=String(label).match(/^([＋+←↑↓↗▦☷▧▤✓⚙☰×])(?:\s|$)/);return m?icon({'＋':'plus','+':'plus','←':'back','↑':'up','↓':'down','↗':'external','▦':'cal','☷':'table','▧':'portfolio','▤':'content','✓':'check','⚙':'settings','☰':'menu','×':'close'}[m[1]])+label.slice(m[1].length):label;}
-

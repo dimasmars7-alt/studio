@@ -1,8 +1,8 @@
-import {escape as e,button as b,pretty} from './ui.js?v=20261008-topic-only7';
-import {icon} from './icons.js?v=20261008-topic-only7';
-import {plannerState} from './planner-model.js?v=20261008-topic-only7';
-import {shotStatus} from './storyboard.js?v=20261008-topic-only7';
-import {siteNav} from './workspace-shell.js?v=20261008-topic-only7';
+import {escape as e,button as b,pretty} from './ui.js?v=20261008-single-plan8';
+import {icon} from './icons.js?v=20261008-single-plan8';
+import {plannerState} from './planner-model.js?v=20261008-single-plan8';
+import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
+import {siteNav} from './workspace-shell.js?v=20261008-single-plan8';
 export function shootRecords(s,u){return plannerState(s).topics.filter(t=>t.projId===u.projId&&(!u.shootTopic||t.id===u.shootTopic)).flatMap(t=>t.scenes.map((scene,index)=>({topic:t,scene,index,key:encodeURIComponent(t.id)+'~'+encodeURIComponent(scene.id)}))).filter(r=>!u.shootDate||r.scene.date===u.shootDate);}
 export function selectedShot(s,u){const rows=shootRecords(s,u);return rows.find(r=>r.key===u.shootSelected)||rows.find(r=>u.shootFilter!=='remaining'||shotStatus(r.scene)!=='Снято');}
 function reference(s,r,small=false){const f=s.files.find(f=>f.id===r.scene.storyboardFileId&&f.projId===r.topic.projId);return f&&/^data:image\/(png|jpeg|webp|gif|avif);base64,/.test(f.data||'')?'<img src="'+e(f.data)+'" alt="'+e(f.name)+'" '+(small?'loading="lazy"':'')+'>':'<span class="no-reference">'+icon('camera')+(small?'':'<span>Референс не прикреплён</span>')+'</span>';}
@@ -16,4 +16,3 @@ export function shootingView(s,u){
  if(t){const timeline=t.scenes.map((scene,index)=>({scene,index,topic:t,key:encodeURIComponent(t.id)+'~'+encodeURIComponent(scene.id)}));h+='<section class="shoot-panel shoot-timeline"><h2>Таймлайн сценария</h2><div>'+timeline.map(r=>b('shoot-select','<strong>'+String(r.index+1).padStart(2,'0')+'</strong><span class="shot-thumb">'+reference(s,r,true)+'</span><span><strong>'+e(r.scene.title||'Без названия')+'</strong><small>'+e(r.scene.plan||'План не выбран')+'</small><small>'+e(r.scene.timeStart||'Без тайминга')+'</small></span>','data-key="'+e(r.key)+'"','timeline-card '+(r.key===selected.key?'selected':''))).join('')+'</div><p class="small-note">Тайминг внутри ролика. Чтобы открыть кадры вне выбранной даты, очистите фильтр даты.</p></section>';}
  return h+'</main></div>';
 }
-

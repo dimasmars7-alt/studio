@@ -1,6 +1,6 @@
-import {field,escape as e,openDialog} from './ui.js?v=20261008-topic-only7';
-import {newTopic,plannerState,saveTopic,platforms,validDate} from './planner-model.js?v=20261008-topic-only7';
-import {uid} from './model.js?v=20261008-topic-only7';
+import {field,escape as e,openDialog} from './ui.js?v=20261008-single-plan8';
+import {newTopic,plannerState,saveTopic,platforms,validDate} from './planner-model.js?v=20261008-single-plan8';
+import {uid} from './model.js?v=20261008-single-plan8';
 
 export function quickCreate(state,u,kind,day,onSave){
  const topics=plannerState(state).topics.filter(t=>t.projId===u.projId);
@@ -26,4 +26,3 @@ export function quickCreate(state,u,kind,day,onSave){
  const topicPick=dialog.querySelector('[name=topicId]');if(topicPick){topicPick.onchange=()=>{const box=dialog.querySelector('#quick-new-title');if(!box)return;box.hidden=Boolean(topicPick.value);box.querySelector('input').required=!topicPick.value;};if(kind==='shoot'){const box=dialog.querySelector('#quick-new-title');box.hidden=true;box.querySelector('input').required=false;}}
  const platformPick=dialog.querySelector('[name=platform]');if(platformPick)platformPick.onchange=()=>{dialog.querySelector('#quick-format').innerHTML=field('format','Формат','','text',[['','Выберите формат'],...(platforms[platformPick.value]||[]).map(f=>[f,f])],true);};
 }
-

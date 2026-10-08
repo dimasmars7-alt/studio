@@ -1,4 +1,4 @@
-import {defaults,normalize} from './model.js?v=20261008-topic-only7';
+import {defaults,normalize} from './model.js?v=20261008-single-plan8';
 let db;
 export async function openStore(){
  db=await new Promise((resolve,reject)=>{
@@ -21,4 +21,3 @@ export function persist(state){
  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Не удалось сохранить данные'));
  });
 }
-

@@ -1,4 +1,4 @@
-import {ensureProjectColors} from './project-colors.js?v=20261008-topic-only7';
+import {ensureProjectColors} from './project-colors.js?v=20261008-single-plan8';
 export const collections=['orgs','projects','posts','shoots','tasks','gear','portfolio','links','files','finances','rubrics','socials','statuses','gearCats','portCats'];
 export const uid=()=>crypto.randomUUID();
 export const dateKey=(d=new Date())=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
@@ -104,4 +104,3 @@ export function repair(s){
  for(const [items,cats] of [['gear','gearCats'],['portfolio','portCats']])next[items].forEach(p=>{if(!next[cats].some(x=>x.id===p.catId))p.catId=''});
  return next;
 }
-

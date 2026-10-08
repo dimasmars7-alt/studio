@@ -1,19 +1,19 @@
-import {shootRecords,selectedShot} from './shooting-mode.js?v=20261008-topic-only7';
-import {initializeQuestions,validateQuestions,requestBrief,aiConnection,generateScenario,resultScenes,acceptScenario} from './qa-scenario.js?v=20261008-topic-only7';
-import {changeTableDate,linkedShoots,ungroupedShoots} from './table-records.js?v=20261008-topic-only7';
-import {nextProjectColor,validColor} from './project-colors.js?v=20261008-topic-only7';
-import {planScenes,scenarioText,planPreview,appendPlan,speakers} from './scenario-plan.js?v=20261008-topic-only7';
-import {seconds,retimeScenes} from './scene-timing.js?v=20261008-topic-only7';
-import {monthShift} from './content-calendar.js?v=20261008-topic-only7';
-import {newShot,shotFields,shotStatus,shotStatuses} from './storyboard.js?v=20261008-topic-only7';
-import {quickCreate} from './quick-create.js?v=20261008-topic-only7';
-import {openStore,persist} from './storage.js?v=20261008-topic-only7';
-import {uid,normalize,removeEntity} from './model.js?v=20261008-topic-only7';
-import {escape as e,field,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261008-topic-only7';
-import {editor} from './planner-view.js?v=20261008-topic-only7';
-import {view} from './reference-view.js?v=20261008-topic-only7';
-import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261008-topic-only7';
-import {platforms,plannerState,newTopic,importLegacy,saveTopic,moscowDate,addDays,validDate} from './planner-model.js?v=20261008-topic-only7';
+import {shootRecords,selectedShot} from './shooting-mode.js?v=20261008-single-plan8';
+import {initializeQuestions,validateQuestions,requestBrief,aiConnection,generateScenario,resultScenes,acceptScenario} from './qa-scenario.js?v=20261008-single-plan8';
+import {changeTableDate,linkedShoots,ungroupedShoots} from './table-records.js?v=20261008-single-plan8';
+import {nextProjectColor,validColor} from './project-colors.js?v=20261008-single-plan8';
+import {planScenes,scenarioText,planPreview,appendPlan,speakers} from './scenario-plan.js?v=20261008-single-plan8';
+import {seconds,retimeScenes} from './scene-timing.js?v=20261008-single-plan8';
+import {monthShift} from './content-calendar.js?v=20261008-single-plan8';
+import {newShot,shotFields,shotStatus,shotStatuses} from './storyboard.js?v=20261008-single-plan8';
+import {quickCreate} from './quick-create.js?v=20261008-single-plan8';
+import {openStore,persist} from './storage.js?v=20261008-single-plan8';
+import {uid,normalize,removeEntity} from './model.js?v=20261008-single-plan8';
+import {escape as e,field,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261008-single-plan8';
+import {editor} from './planner-view.js?v=20261008-single-plan8';
+import {view} from './reference-view.js?v=20261008-single-plan8';
+import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261008-single-plan8';
+import {platforms,plannerState,newTopic,importLegacy,saveTopic,moscowDate,addDays,validDate} from './planner-model.js?v=20261008-single-plan8';
 let state,busy=false,aiAbort=null,aiRun=0;
 const u={navScope:'projects',folderId:'',orgId:'',projId:'',archive:false,view:'table',calendarMode:'week',calendarDate:moscowDate(),channel:'',scriptEdits:{},tableDate:null,boardTopic:'',boardFilter:'all',calendarMonth:moscowDate().slice(0,7)+'-01',week:moscowDate(),draft:null,dirty:false,editorTab:'topic',wizard:false,wizardStep:0};
 const $=selector=>document.querySelector(selector);
@@ -194,8 +194,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&u.tableDate
 document.addEventListener('keydown',event=>{if(event.key!=='Tab'||!u.draft||innerWidth>780||$('#modal').open)return;const nodes=[...$('#topic-form').querySelectorAll('button,input,select,textarea,summary')].filter(x=>!x.disabled&&x.getClientRects().length);const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}});
 window.addEventListener('beforeunload',event=>{if(u.dirty||u.tableDate||u.shootNoteDirty){event.preventDefault();event.returnValue='';}});
 document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(a&&(u.dirty||u.shootNoteDirty)){event.preventDefault();guard(()=>{location.href=a.href})}});
-(async()=>{try{const result=await openStore(),migrated=importLegacy(result.state);state=migrated.state;if(migrated.changed)await persist(state);try{Object.assign(u,JSON.parse(localStorage.getItem('studio-planner-context')||'{}'));}catch{}selectInitial();render();const topicId=new URLSearchParams(location.search).get('topic');if(topicId){const topic=plannerState(state).topics.find(t=>t.id===topicId);if(topic){u.orgId=state.projects.find(p=>p.id===topic.projId)?.orgId||u.orgId;openTopic(topicId,'scenes');}}}catch(err){$('#planner').innerHTML='<section class="empty-panel"><h1>Не удалось открыть план</h1><p>'+e(err.message)+'</p><a href="./index.html#content">Вернуться к прежней версии</a></section>';}})();
+(async()=>{try{const result=await openStore(),migrated=importLegacy(result.state);state=migrated.state;if(migrated.changed)await persist(state);try{Object.assign(u,JSON.parse(localStorage.getItem('studio-planner-context')||'{}'));}catch{}selectInitial();render();const topicId=new URLSearchParams(location.search).get('topic');if(topicId){const topic=plannerState(state).topics.find(t=>t.id===topicId);if(topic){u.orgId=state.projects.find(p=>p.id===topic.projId)?.orgId||u.orgId;openTopic(topicId,'scenes');}}}catch(err){$('#planner').innerHTML='<section class="empty-panel"><h1>Не удалось открыть план</h1><p>'+e(err.message)+'</p><a href="./index.html#home">Вернуться на главную</a></section>';}})();
 
 document.addEventListener('keydown',event=>{const node=event.target.closest('[role=tab][data-action=editor-tab]');if(!node||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=[...node.closest('[role=tablist]').querySelectorAll('[role=tab]')],i=tabs.indexOf(node),target=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[target].click();});
-
 

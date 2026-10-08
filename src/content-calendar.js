@@ -1,7 +1,7 @@
-import {projectColor,projectName} from './project-colors.js?v=20261008-topic-only7';
-import {escape as e,button as b} from './ui.js?v=20261008-topic-only7';
-import {moscowDate,addDays} from './planner-model.js?v=20261008-topic-only7';
-import {shotStatus} from './storyboard.js?v=20261008-topic-only7';
+import {projectColor,projectName} from './project-colors.js?v=20261008-single-plan8';
+import {escape as e,button as b} from './ui.js?v=20261008-single-plan8';
+import {moscowDate,addDays} from './planner-model.js?v=20261008-single-plan8';
+import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
 export const calendarModes=['week','month','half','day'];
 export const monthShift=(date,delta)=>{const d=new Date(date.slice(0,7)+'-01T12:00Z');d.setUTCMonth(d.getUTCMonth()+delta);return d.toISOString().slice(0,10);};
 const fmt=(d,options={day:'numeric',month:'long',year:'numeric'})=>new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{...options,timeZone:'Europe/Moscow'});
@@ -19,4 +19,3 @@ export function contentCalendar(s,u,topics){const mode=calendarModes.includes(u.
  if(mode==='day'){const rows=events.filter(x=>x.date===anchor);h+='<div class="content-day-heading">'+b('day-create','＋ Добавить на этот день','data-day="'+anchor+'"','primary')+'</div><div class="content-day-list">'+rows.map(x=>eventCard(x,s,u)).join('')+(!rows.length?'<p class="group-empty">На этот день ничего не назначено.</p>':'')+'</div>';}
  return h+'<p class="small-note calendar-legend"><span>● Публикация</span><span>● Съёмка</span><span>● Крайний срок</span><span>● Задача</span> · даты по Москве</p>';
 }
-

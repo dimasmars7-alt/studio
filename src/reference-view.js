@@ -1,13 +1,13 @@
-import {shootingView} from './shooting-mode.js?v=20261008-topic-only7';
-import {projectColor} from './project-colors.js?v=20261008-topic-only7';
-import {siteNav,siteHeader} from './workspace-shell.js?v=20261008-topic-only7';
-import {contentCalendar} from './content-calendar.js?v=20261008-topic-only7';
-import {detailedTable,projectAssets} from './project-assets.js?v=20261008-topic-only7';
-import {projectBoards,scriptBoards} from './storyboard.js?v=20261008-topic-only7';
-import {escape as e,button as b,badge} from './ui.js?v=20261008-topic-only7';
-import {editor} from './planner-view.js?v=20261008-topic-only7';
-import {plannerState,moscowDate,addDays,platforms} from './planner-model.js?v=20261008-topic-only7';
-import {scopeFolders} from './folder-model.js?v=20261008-topic-only7';
+import {shootingView} from './shooting-mode.js?v=20261008-single-plan8';
+import {projectColor} from './project-colors.js?v=20261008-single-plan8';
+import {siteNav,siteHeader} from './workspace-shell.js?v=20261008-single-plan8';
+import {contentCalendar} from './content-calendar.js?v=20261008-single-plan8';
+import {detailedTable,projectAssets} from './project-assets.js?v=20261008-single-plan8';
+import {projectBoards,scriptBoards} from './storyboard.js?v=20261008-single-plan8';
+import {escape as e,button as b,badge} from './ui.js?v=20261008-single-plan8';
+import {editor} from './planner-view.js?v=20261008-single-plan8';
+import {plannerState,moscowDate,addDays,platforms} from './planner-model.js?v=20261008-single-plan8';
+import {scopeFolders} from './folder-model.js?v=20261008-single-plan8';
 const date=d=>d?new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:'Europe/Moscow'}):'Без даты';
 const pick=(key,label,id,items,add)=>'<label class="field">'+label+'<select data-select="'+key+'" aria-label="'+label+'"><option value="">Выберите</option>'+items.map(x=>'<option value="'+e(x.id)+'" '+(x.id===id?'selected':'')+'>'+e(x.name)+'</option>').join('')+'<option value="__add__">＋ '+add+'</option></select></label>';
 const channel=t=>[...new Set(t.variants.map(v=>v.platform))].filter(Boolean);
@@ -37,4 +37,3 @@ export function view(s,u){
 }
 
 function scenarioMenu(u,mode){const selected=['scripts','boards'].includes(mode)?mode:u.scenarioView,label=selected==='scripts'?'Сценарии':selected==='boards'?'Раскадровки':'Сценарии и раскадровки';return '<details class="scenario-view-menu '+(['scripts','boards'].includes(mode)?'active':'')+'"><summary aria-label="'+label+' · выбрать раздел">'+label+' <span aria-hidden="true">⌄</span></summary><div>'+b('view','▤ Сценарии','data-view="scripts" aria-pressed="'+(mode==='scripts')+'"')+b('view','▧ Раскадровки','data-view="boards" aria-pressed="'+(mode==='boards')+'"')+'</div></details>';}
-

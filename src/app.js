@@ -1,13 +1,12 @@
-import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261008-topic-only7';
-import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261008-topic-only7';
-import {openStore,persist} from './storage.js?v=20261008-topic-only7';
-import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261008-topic-only7';
-import * as views from './views.js?v=20261008-topic-only7';
-import {content,platforms,selectedPosts} from './content.js?v=20261008-topic-only7';
-import {publicationForm,templates,moscowDate} from './planning.js?v=20261008-topic-only7';
+import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261008-single-plan8';
+import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261008-single-plan8';
+import {openStore,persist} from './storage.js?v=20261008-single-plan8';
+import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261008-single-plan8';
+import * as views from './views.js?v=20261008-single-plan8';
+import {content,platforms,selectedPosts} from './content.js?v=20261008-single-plan8';
+import {publicationForm,templates,moscowDate} from './planning.js?v=20261008-single-plan8';
 let state,busy=false;
-let contentView='new';try{contentView=localStorage.getItem('studio-content-view')==='old'?'old':'new'}catch{}
-const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:'',contentView};
+const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
 const $=s=>document.querySelector(s);
 const titles={shoots:'Съёмка',orgs:'Организация',projects:'Проект',posts:'Материал',tasks:'Задача',gear:'Снаряжение',portfolio:'Работа в портфолио',links:'Ссылка',finances:'Финансовая операция',rubrics:'Рубрика',socials:'Соцсеть',statuses:'Статус',gearCats:'Категория снаряжения',portCats:'Категория портфолио'};
 function applyAppearance(){
@@ -16,7 +15,6 @@ function applyAppearance(){
 }
 function render(){
  applyAppearance();
- document.documentElement.dataset.contentNew=String(ui.section==='content'&&ui.contentView==='new');
  const renderers={home:views.home,cal:views.calendar,content,tasks:views.tasks,gear:views.gear,portfolio:views.portfolio,account:views.account,settings:views.settings};
  $('#app').innerHTML=views.shell(state,ui,renderers[ui.section](state,ui));
 }
@@ -25,6 +23,7 @@ async function commit(next,message='Сохранено'){
  busy=true;try{await persist(next);state=next;render();if(message)toast(message)}finally{busy=false}
 }
 function navigate(section){
+ if(section==='content'){location.href='./planner.html';return}
  ui.section=section;ui.query='';location.hash=section;render();
 }
 const choices=(key)=>[['','Не выбрано'],...state[key].map(x=>[x.id,(x.emoji||'')+' '+x.name])];
@@ -130,7 +129,6 @@ document.addEventListener('click',async event=>{
  else if(action==='add')entityForm(type,null,date);
  else if(action==='edit')entityForm(type,id);
  else if(action==='script-template'){const text=templates[btn.dataset.template],input=btn.closest('form')?.querySelector('[name=text]');if(input&&text){input.value+=(input.value?'\n\n':'')+text;input.focus();toast('Шаблон добавлен в карточку. Нажмите «Сохранить», чтобы сохранить.')}}
- else if(action==='content-view'){ui.contentView=btn.dataset.view;try{localStorage.setItem('studio-content-view',ui.contentView)}catch{toast('Выбор вида доступен до закрытия вкладки')};render()}
  else if(action==='content-project'){ui.projId=id;render()}
  else if(action==='content-social'){ui.postSocial=btn.dataset.social;render()}
  else if(action==='copy-script'){const post=state.posts.find(x=>x.id===id);if(!post?.text)throw Error('Текст сценария отсутствует');try{await navigator.clipboard.writeText(post.text);toast('Текст скопирован')}catch{openDialog('Копирование текста','<label class="field">Выделите и скопируйте текст<textarea readonly rows="10">'+e(post.text)+'</textarea></label>');$('#modal textarea').select()}}
@@ -145,7 +143,7 @@ document.addEventListener('click',async event=>{
  else if(action==='post-prev'||action==='post-next')shiftDate('postDate',action==='post-prev'?-1:1,'month');
  else if(action==='post-today'){ui.postDate=moscowDate();render()}
  else if(action==='post-day'){
- const rows=(ui.contentView==='new'?selectedPosts(state,ui):state.posts.filter(x=>x.projId===ui.projId)).filter(x=>x.date===date);
+ const rows=selectedPosts(state,ui).filter(x=>x.date===date);
  openDialog('Публикации · '+date,(rows.length?rows.map(x=>'<div class="list-row"><strong>'+e(x.title)+'</strong>'+b('edit','Изменить','data-type="posts" data-id="'+e(x.id)+'"')+'</div>').join(''):empty('Нет публикаций'))+b('add','＋ Пост','data-type="posts" data-date="'+date+'"','primary'),null);
  }else if(action==='post-tab'){ui.postTab=tab;render()}
  else if(action==='task-filter'){ui.taskFilter=filter;render()}
@@ -188,7 +186,7 @@ document.addEventListener('input',event=>{
  const value=event.target.value,position=event.target.selectionStart;
  clearTimeout(searchTimer);searchTimer=setTimeout(()=>{ui.query=value;render();const input=$('[data-control=query]');input?.focus();input?.setSelectionRange(position,position)},180);
 });
-window.addEventListener('hashchange',()=>{const section=location.hash.slice(1);if(state&&views.sections.some(x=>x[0]===section)&&ui.section!==section){ui.section=section;ui.query='';render()}});
+window.addEventListener('hashchange',()=>{const section=location.hash.slice(1);if(section==='content'){location.href='./planner.html';return}if(state&&views.sections.some(x=>x[0]===section)&&ui.section!==section){ui.section=section;ui.query='';render()}});
 let overviewDate=moscowDate();
 function refreshOverviewDate(){const current=moscowDate();if(current!==overviewDate){overviewDate=current;if(state&&ui.section==='content')render()}}
 setInterval(refreshOverviewDate,30000);
@@ -204,4 +202,3 @@ async function init(){
 init();
 
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#modal').open){$('#sidebar')?.classList.remove('open');$('[data-action=menu]')?.setAttribute('aria-expanded','false');}});
-

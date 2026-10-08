@@ -1,5 +1,5 @@
-import {shotStatus} from './storyboard.js?v=20261008-topic-only7';
-import {plannerState,saveTopic,validDate} from './planner-model.js?v=20261008-topic-only7';
+import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
+import {plannerState,saveTopic,validDate} from './planner-model.js?v=20261008-single-plan8';
 
 export function linkedShoots(s,t){
  const ids=new Set([t.legacyShootId,...t.scenes.map(x=>x.shootId)].filter(Boolean));
@@ -45,4 +45,3 @@ export function changeTableDate(s,projId,edit,value){
  const copy=structuredClone(topic);copy[edit.group].find(x=>x.id===edit.id)[edit.field]=value;
  return saveTopic(s,copy);
 }
-

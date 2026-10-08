@@ -1,4 +1,4 @@
-import {plannerState} from './planner-model.js?v=20261008-topic-only7';
+import {plannerState} from './planner-model.js?v=20261008-single-plan8';
 export const scope=u=>u.navScope==='organizations'?'org':'project';
 export const owner=u=>scope(u)==='org'?u.orgId:u.projId;
 export function scopeFolders(s,u){return (plannerState(s).folders||[]).filter(f=>f.scope===scope(u)&&f.ownerId===owner(u));}
@@ -6,4 +6,3 @@ export function scopeTopics(s,u){const ids=scope(u)==='org'?s.projects.filter(p=
 export function folderTopics(s,u){const folders=scopeFolders(s,u);return scopeTopics(s,u).filter(t=>u.folderId?(t.folderIds||[]).includes(u.folderId):!(t.folderIds||[]).some(id=>folders.some(f=>f.id===id)));}
 export function moveToFolder(s,t,u,id){const folders=scopeFolders(s,u);if(id&&!folders.some(f=>f.id===id))throw Error('Папка не найдена');t.folderIds=(t.folderIds||[]).filter(value=>!folders.some(f=>f.id===value));if(id)t.folderIds.push(id);}
 export function tableRows(s,u){const rows=[];for(const t of folderTopics(s,u)){for(const v of t.variants)rows.push({id:v.id,topic:t,kind:'Публикация',title:t.title,date:v.date,channel:v.platform+' · '+v.format,status:v.ready||'Черновик',tab:'variants'});for(const x of t.scenes)rows.push({id:x.id,topic:t,kind:'Съёмка',title:x.title,date:x.date,channel:t.variants.map(v=>v.platform).filter((v,i,a)=>a.indexOf(v)===i).join(', ')||'Не выбран',status:x.filmed?'Снято':'Не снято',tab:'scenes',scene:x});if(!t.scenes.length&&!t.variants.length)rows.push({id:t.id,topic:t,kind:'Тема',title:t.title,date:t.day,channel:'Не выбран',status:'Планирование',tab:'topic'});}return rows.sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));}
-

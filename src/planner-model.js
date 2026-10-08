@@ -1,6 +1,6 @@
-import {validateTiming} from './scene-timing.js?v=20261008-topic-only7';
-import {uid} from './model.js?v=20261008-topic-only7';
-import {moscowDate,addDays,published} from './planning.js?v=20261008-topic-only7';
+import {validateTiming} from './scene-timing.js?v=20261008-single-plan8';
+import {uid} from './model.js?v=20261008-single-plan8';
+import {moscowDate,addDays,published} from './planning.js?v=20261008-single-plan8';
 export {moscowDate,addDays};
 export const platforms={Telegram:['Пост','Фото','Видео'],VK:['Пост','Клип','Видео','Альбом'],Instagram:['Публикация','Сторис','Reels'],YouTube:['Shorts','Выпуск']};
 export const approval=['Не отправлено','На согласовании','Согласовано','Нужны правки'];
@@ -52,4 +52,3 @@ export function weekEvents(s,projId,from){const to=addDays(from,6),p=plannerStat
 export function draftFromAnswers(a){
  const sections=[['ТЕМА И ЗАДАЧА',[a.problem,a.work]],['ДЛЯ КОГО И ЗАЧЕМ',[a.audience,a.goal]],['ПЛОЩАДКА И ФОРМАТ',[a.platform,a.format]],['НАЧАЛО',[a.problem]],['СЪЁМКА И КАДРЫ',[a.available,a.mustCapture]],['ПОДТВЕРЖДЁННЫЕ ФАКТЫ / РЕЗУЛЬТАТ',[a.facts]],['В КАДРЕ И РЕПЛИКИ',[a.speaker]],['ДЛИНА И ТОН',[a.length,a.tone]],['ДАТЫ',[a.shootDate?'Съёмка: '+a.shootDate:'',a.deadline?'Крайний срок: '+a.deadline:'']],['ЗАВЕРШЕНИЕ',[a.goal]]];return 'СТРУКТУРИРОВАННЫЙ ЧЕРНОВИК ПО ВАШИМ ОТВЕТАМ\n\n'+sections.map(([title,values])=>title+'\n'+(values.filter(Boolean).join('\n')||'[Дополнить вручную]')).join('\n\n');
 }
-
