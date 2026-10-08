@@ -1,0 +1,8 @@
+export const timecode=seconds=>Math.floor(seconds/60).toString().padStart(2,'0')+':'+(seconds%60).toString().padStart(2,'0');
+export function seconds(value){if(!/^\d{1,3}:[0-5]\d$/.test(value||''))return null;const [m,s]=value.split(':').map(Number);return m*60+s;}
+export function timingLabel(x){const a=seconds(x.timeStart),b=seconds(x.timeEnd);return a!==null&&b!==null?timecode(a)+' — '+timecode(b)+' · '+(b-a)+' сек.':'Тайминг не задан';}
+export function validateTiming(scenes){for(const x of scenes){if(!x.timeStart&&!x.timeEnd)continue;const a=seconds(x.timeStart),b=seconds(x.timeEnd);if(a===null||b===null)throw Error('Тайминг сцены: укажите начало и конец в формате 00:00');if(b<=a)throw Error('Конец сцены должен быть позже начала');}}
+
+export function validateSequence(scenes){validateTiming(scenes);let end=0;for(const x of scenes){const a=seconds(x.timeStart),b=seconds(x.timeEnd);if(a===null||b===null||a<end)throw Error('Сцены должны идти последовательно, без пересечений');end=b;}return end;}
+export function retimeScenes(scenes,id,duration){const n=Number(duration);if(!Number.isInteger(n)||n<1||n>3600)throw Error('Длительность сцены — от 1 до 3600 секунд');const copy=structuredClone(scenes),index=copy.findIndex(x=>x.id===id);if(index<0)throw Error('Сцена не найдена');let cursor=seconds(copy[index].timeStart)??(index?seconds(copy[index-1].timeEnd):0);if(cursor===null)throw Error('Сначала задайте конец предыдущей сцены');for(let i=index;i<copy.length;i++){const x=copy[i],a=seconds(x.timeStart),b=seconds(x.timeEnd),length=i===index?n:a!==null&&b!==null&&b>a?b-a:5;x.timeStart=timecode(cursor);cursor+=length;x.timeEnd=timecode(cursor);}validateSequence(copy);return copy;}
+

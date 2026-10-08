@@ -1,0 +1,5 @@
+const container=document.querySelector('#planner');
+function showFailure(error){if(!container.querySelector('.loading'))return;console.error('Не удалось запустить контент-план:',error);container.replaceChildren();const panel=document.createElement('section');panel.className='empty-panel';const title=document.createElement('h1');title.textContent='Не удалось загрузить контент-план';const note=document.createElement('p');note.textContent='Повторите загрузку. Сохранённые материалы остаются на этом устройстве.';const button=document.createElement('button');button.type='button';button.className='primary';button.textContent='Повторить загрузку';button.onclick=()=>location.reload();panel.append(title,note,button);container.append(panel);}
+window.addEventListener('error',event=>showFailure(event.error||event.message));window.addEventListener('unhandledrejection',event=>showFailure(event.reason));
+import('./planner-app.js?v=20261008-topic-only7').catch(showFailure);
+

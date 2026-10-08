@@ -1,4 +1,4 @@
-import {defaults,normalize} from './model.js';
+import {defaults,normalize} from './model.js?v=20261008-topic-only7';
 let db;
 export async function openStore(){
  db=await new Promise((resolve,reject)=>{
@@ -10,7 +10,7 @@ export async function openStore(){
  });
  db.onversionchange=()=>db.close();
  const saved=await new Promise((resolve,reject)=>{const r=db.transaction('state').objectStore('state').get('current');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});
- if(saved)return {state:normalize(saved),migrated:false};
+ if(saved){const state=normalize(saved);if(JSON.stringify(state.projects)!==JSON.stringify(saved.projects))await persist(state);return {state,migrated:false};}
  const legacy=localStorage.getItem('studio');
  if(legacy){const state=normalize(JSON.parse(legacy));await persist(state);return {state,migrated:true}}
  const state=defaults();await persist(state);return {state,migrated:false};
@@ -21,3 +21,4 @@ export function persist(state){
  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Не удалось сохранить данные'));
  });
 }
+

@@ -23,3 +23,4 @@ Options -Indexes
 
 # Enable HTTPS redirection in your hosting panel AFTER installing SSL.
 # Hash routing is used: SPA rewrite rules are not required.
+

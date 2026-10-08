@@ -1,9 +1,10 @@
+import {icon} from './icons.js?v=20261008-topic-only7';
 export const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const money=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(Number(n)||0);
 export const pretty=d=>d?new Date(d+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'}):'Без даты';
 export function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
 export const link=(url,label='Открыть ↗')=>safeUrl(url)?'<a href="'+escape(safeUrl(url))+'" target="_blank" rel="noopener noreferrer">'+escape(label)+'</a>':'';
-export const button=(action,label,data='',cls='')=>'<button type="button" class="'+cls+'" data-action="'+action+'" '+data+'>'+label+'</button>';
+export const button=(action,label,data='',cls='')=>'<button type="button" class="'+cls+'" data-action="'+action+'" '+data+'>'+decorate(label)+'</button>';
 export const empty=(title,detail='Добавьте первую запись, чтобы начать работу.')=>'<div class="empty"><span>◇</span><h3>'+escape(title)+'</h3><p>'+escape(detail)+'</p></div>';
 export const badge=(text,color='#81867d')=>'<span class="badge" style="--tag:'+(/^#[0-9a-f]{6}$/i.test(color)?color:'#81867d')+'">'+escape(text)+'</span>';
 export function field(name,label,value='',type='text',options=null,required=false){
@@ -25,3 +26,6 @@ export function openDialog(title,body,onSubmit,wide=false){
  form.onsubmit=async e=>{if(!onSubmit)return;e.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;try{await onSubmit(Object.fromEntries(new FormData(form)));d.close()}catch(err){toast(err.message)}finally{submit.disabled=false}};
  if(!d.open)d.showModal();
 }
+
+function decorate(label){const m=String(label).match(/^([＋+←↑↓↗▦☷▧▤✓⚙☰×])(?:\s|$)/);return m?icon({'＋':'plus','+':'plus','←':'back','↑':'up','↓':'down','↗':'external','▦':'cal','☷':'table','▧':'portfolio','▤':'content','✓':'check','⚙':'settings','☰':'menu','×':'close'}[m[1]])+label.slice(m[1].length):label;}
+
