@@ -3,7 +3,16 @@ name: REG.RU — проверка и публикация
 on:
   push:
     branches: [main]
-    paths:\n      - .github/workflows/reg-ru.yml\n      - index.html\n      - planner.html\n      - manifest.json\n      - sw.js\n      - .htaccess\n      - icon-192.png\n      - icon-512.png\n      - src/**
+    paths:
+      - '.github/workflows/reg-ru.yml'
+      - 'index.html'
+      - 'planner.html'
+      - 'manifest.json'
+      - 'sw.js'
+      - '.htaccess'
+      - 'icon-192.png'
+      - 'icon-512.png'
+      - 'src/**'
   workflow_dispatch:
     inputs:
       publish:
