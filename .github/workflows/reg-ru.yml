@@ -80,7 +80,7 @@ jobs:
           echo '### Проверка подключения успешна' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Подготовить файлы для публикации
-        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish]'))
         shell: bash
         run: |
           set -euo pipefail
@@ -95,7 +95,7 @@ jobs:
           (cd "$RUNNER_TEMP/site" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUNNER_TEMP/site-sha256.txt"
 
       - name: Создать резервную копию на хостинге
-        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish]'))
         shell: bash
         run: |
           set -euo pipefail
@@ -109,7 +109,7 @@ jobs:
             printf "Резервная копия: %s\n" "$backup"'
 
       - name: Загрузить обновления и проверить файлы
-        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish]'))
         shell: bash
         run: |
           set -euo pipefail
