@@ -1,6 +1,6 @@
-import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
-import {linkedShoots} from './table-records.js?v=20261008-single-plan8';
-import {moscowDate,plannerState} from './planner-model.js?v=20261008-single-plan8';
+import {shotStatus} from './storyboard.js?v=20261012-cloud1';
+import {linkedShoots} from './table-records.js?v=20261012-cloud1';
+import {moscowDate,plannerState} from './planner-model.js?v=20261012-cloud1';
 
 export function topicNumber(s,projId,id){return plannerState(s).topics.filter(t=>t.projId===projId).findIndex(t=>t.id===id)+1;}
 export const shortDate=value=>value?new Date(value+'T12:00:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:'Europe/Moscow'}):'';

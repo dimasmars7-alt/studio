@@ -1,11 +1,11 @@
-import {escape as e,button as b,pretty} from './ui.js?v=20261008-single-plan8';
-import {icon} from './icons.js?v=20261008-single-plan8';
-import {plannerState} from './planner-model.js?v=20261008-single-plan8';
-import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
-import {siteNav} from './workspace-shell.js?v=20261008-single-plan8';
+import {escape as e,button as b,pretty} from './ui.js?v=20261012-cloud1';
+import {icon} from './icons.js?v=20261012-cloud1';
+import {plannerState} from './planner-model.js?v=20261012-cloud1';
+import {shotStatus} from './storyboard.js?v=20261012-cloud1';
+import {siteNav} from './workspace-shell.js?v=20261012-cloud1';
 export function shootRecords(s,u){return plannerState(s).topics.filter(t=>t.projId===u.projId&&(!u.shootTopic||t.id===u.shootTopic)).flatMap(t=>t.scenes.map((scene,index)=>({topic:t,scene,index,key:encodeURIComponent(t.id)+'~'+encodeURIComponent(scene.id)}))).filter(r=>!u.shootDate||r.scene.date===u.shootDate);}
 export function selectedShot(s,u){const rows=shootRecords(s,u);return rows.find(r=>r.key===u.shootSelected)||rows.find(r=>u.shootFilter!=='remaining'||shotStatus(r.scene)!=='Снято');}
-function reference(s,r,small=false){const f=s.files.find(f=>f.id===r.scene.storyboardFileId&&f.projId===r.topic.projId);return f&&/^data:image\/(png|jpeg|webp|gif|avif);base64,/.test(f.data||'')?'<img src="'+e(f.data)+'" alt="'+e(f.name)+'" '+(small?'loading="lazy"':'')+'>':'<span class="no-reference">'+icon('camera')+(small?'':'<span>Референс не прикреплён</span>')+'</span>';}
+function reference(s,r,small=false){const f=s.files.find(f=>f.id===r.scene.storyboardFileId&&f.projId===r.topic.projId);return f&&/^data:image\/(png|jpeg|webp|gif|avif);base64,/.test(f.data||'')?'<img src="'+e(f.data)+'" alt="'+e(f.name)+'" '+(small?'loading="lazy"':'')+'>':f?.storagePath&&/^image\//.test(f.type||'')?'<img data-cloud-file="'+e(f.id)+'" alt="'+e(f.name)+'" '+(small?'loading="lazy"':'')+' hidden>':'<span class="no-reference">'+icon('camera')+(small?'':'<span>Референс не прикреплён</span>')+'</span>';}
 function status(r){const value=shotStatus(r.scene);return '<span class="shoot-state '+(value==='Снято'?'done':r.scene.beforeWork?'critical':'')+'">'+icon(value==='Снято'?'check':'clock')+e(value==='Снято'?'Снято':r.scene.beforeWork?'Важно':value==='Переснять'?'Переснять':'Осталось')+'</span>';}
 export function shootingView(s,u){
  const rows=shootRecords(s,u),selected=selectedShot(s,u),shown=rows.filter(r=>u.shootFilter!=='remaining'||shotStatus(r.scene)!=='Снято'),done=rows.filter(r=>shotStatus(r.scene)==='Снято').length,left=rows.length-done,critical=rows.filter(r=>r.scene.beforeWork&&shotStatus(r.scene)!=='Снято').length,p=s.projects.find(x=>x.id===u.projId),org=s.orgs.find(x=>x.id===p?.orgId),sc=selected?.scene,t=selected?.topic;

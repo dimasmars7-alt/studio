@@ -1,6 +1,6 @@
-import {validateTiming} from './scene-timing.js?v=20261008-single-plan8';
-import {uid} from './model.js?v=20261008-single-plan8';
-import {moscowDate,addDays,published} from './planning.js?v=20261008-single-plan8';
+import {validateTiming} from './scene-timing.js?v=20261012-cloud1';
+import {uid} from './model.js?v=20261012-cloud1';
+import {moscowDate,addDays,published} from './planning.js?v=20261012-cloud1';
 export {moscowDate,addDays};
 export const platforms={Telegram:['Пост','Фото','Видео'],VK:['Пост','Клип','Видео','Альбом'],Instagram:['Публикация','Сторис','Reels'],YouTube:['Shorts','Выпуск']};
 export const approval=['Не отправлено','На согласовании','Согласовано','Нужны правки'];

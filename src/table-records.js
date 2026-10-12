@@ -1,5 +1,5 @@
-import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
-import {plannerState,saveTopic,validDate} from './planner-model.js?v=20261008-single-plan8';
+import {shotStatus} from './storyboard.js?v=20261012-cloud1';
+import {plannerState,saveTopic,validDate} from './planner-model.js?v=20261012-cloud1';
 
 export function linkedShoots(s,t){
  const ids=new Set([t.legacyShootId,...t.scenes.map(x=>x.shootId)].filter(Boolean));

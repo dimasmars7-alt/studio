@@ -49,6 +49,12 @@ export async function signIn(email,password){
  saveSession(result);return authState();
 }
 
+export async function signUp(email,password){
+ const result=await authRequest('signup',{method:'POST',body:JSON.stringify({email:String(email||'').trim(),password:String(password||'')})});
+ if(result?.access_token&&result?.refresh_token)saveSession(result);
+ return {state:authState(),confirmationRequired:!result?.access_token,user:result?.user||null};
+}
+
 export async function refreshSession(){
  if(!session?.refresh_token)return null;
  try{

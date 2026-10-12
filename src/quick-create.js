@@ -1,6 +1,6 @@
-import {field,escape as e,openDialog} from './ui.js?v=20261008-single-plan8';
-import {newTopic,plannerState,saveTopic,platforms,validDate} from './planner-model.js?v=20261008-single-plan8';
-import {uid} from './model.js?v=20261008-single-plan8';
+import {field,escape as e,openDialog} from './ui.js?v=20261012-cloud1';
+import {newTopic,plannerState,saveTopic,platforms,validDate} from './planner-model.js?v=20261012-cloud1';
+import {uid} from './model.js?v=20261012-cloud1';
 
 export function quickCreate(state,u,kind,day,onSave){
  const topics=plannerState(state).topics.filter(t=>t.projId===u.projId);

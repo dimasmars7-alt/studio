@@ -1,4 +1,4 @@
-import {plannerState} from './planner-model.js?v=20261008-single-plan8';
+import {plannerState} from './planner-model.js?v=20261012-cloud1';
 export const scope=u=>u.navScope==='organizations'?'org':'project';
 export const owner=u=>scope(u)==='org'?u.orgId:u.projId;
 export function scopeFolders(s,u){return (plannerState(s).folders||[]).filter(f=>f.scope===scope(u)&&f.ownerId===owner(u));}

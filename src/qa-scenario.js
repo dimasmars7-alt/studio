@@ -1,8 +1,8 @@
-import {escape as e,field,button as b} from './ui.js?v=20261008-single-plan8';
-import {platforms,plannerState,validDate} from './planner-model.js?v=20261008-single-plan8';
-import {speakers,appendPlan} from './scenario-plan.js?v=20261008-single-plan8';
-import {uid} from './model.js?v=20261008-single-plan8';
-import {timecode,validateSequence,timingLabel} from './scene-timing.js?v=20261008-single-plan8';
+import {escape as e,field,button as b} from './ui.js?v=20261012-cloud1';
+import {platforms,plannerState,validDate} from './planner-model.js?v=20261012-cloud1';
+import {speakers,appendPlan} from './scenario-plan.js?v=20261012-cloud1';
+import {uid} from './model.js?v=20261012-cloud1';
+import {timecode,validateSequence,timingLabel} from './scene-timing.js?v=20261012-cloud1';
 
 export const questionTitles=['О чём видео и зачем?','Где выйдет материал?','Что известно о работе?','Для кого это видео?','Что можно показать?','Кто будет говорить?','Какой длины и в каком тоне?','Чем завершить видео?','Проверка перед генерацией'];
 export function initializeQuestions(t){

@@ -1,7 +1,7 @@
-import {projectColor,projectName} from './project-colors.js?v=20261008-single-plan8';
-import {escape as e,button as b} from './ui.js?v=20261008-single-plan8';
-import {moscowDate,addDays} from './planner-model.js?v=20261008-single-plan8';
-import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
+import {projectColor,projectName} from './project-colors.js?v=20261012-cloud1';
+import {escape as e,button as b} from './ui.js?v=20261012-cloud1';
+import {moscowDate,addDays} from './planner-model.js?v=20261012-cloud1';
+import {shotStatus} from './storyboard.js?v=20261012-cloud1';
 export const calendarModes=['week','month','half','day'];
 export const monthShift=(date,delta)=>{const d=new Date(date.slice(0,7)+'-01T12:00Z');d.setUTCMonth(d.getUTCMonth()+delta);return d.toISOString().slice(0,10);};
 const fmt=(d,options={day:'numeric',month:'long',year:'numeric'})=>new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{...options,timeZone:'Europe/Moscow'});

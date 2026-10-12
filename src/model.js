@@ -1,4 +1,4 @@
-import {ensureProjectColors} from './project-colors.js?v=20261008-single-plan8';
+import {ensureProjectColors} from './project-colors.js?v=20261012-cloud1';
 export const collections=['orgs','projects','posts','shoots','tasks','gear','portfolio','links','files','finances','rubrics','socials','statuses','gearCats','portCats'];
 export const uid=()=>crypto.randomUUID();
 export const dateKey=(d=new Date())=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');

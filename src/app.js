@@ -1,10 +1,12 @@
-import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261008-single-plan8';
-import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261008-single-plan8';
-import {openStore,persist} from './storage.js?v=20261008-single-plan8';
-import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261008-single-plan8';
-import * as views from './views.js?v=20261008-single-plan8';
-import {content,platforms,selectedPosts} from './content.js?v=20261008-single-plan8';
-import {publicationForm,templates,moscowDate} from './planning.js?v=20261008-single-plan8';
+import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261012-cloud1';
+import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
+import {openStore,persist} from './storage.js?v=20261012-cloud1';
+import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261012-cloud1';
+import * as views from './views.js?v=20261012-cloud1';
+import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
+import {publicationForm,templates,moscowDate} from './planning.js?v=20261012-cloud1';
+import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261012-cloud1';
+import {handleCloudAction} from './cloud-ui.js?v=20261012-cloud1';
 let state,busy=false;
 const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
 const $=s=>document.querySelector(s);
@@ -17,11 +19,15 @@ function render(){
  applyAppearance();
  const renderers={home:views.home,cal:views.calendar,content,tasks:views.tasks,gear:views.gear,portfolio:views.portfolio,account:views.account,settings:views.settings};
  $('#app').innerHTML=views.shell(state,ui,renderers[ui.section](state,ui));
+ hydrateCloudImages(document,state);
 }
 async function commit(next,message='Сохранено'){
  if(busy)throw Error('Дождитесь сохранения текущего изменения');
- busy=true;try{await persist(next);state=next;render();if(message)toast(message)}finally{busy=false}
+ busy=true;try{await persist(next);state=next;render();queueCloudSync(state,applyCloudMetadata);if(message)toast(message)}finally{busy=false}
 }
+async function applyCloudMetadata(synced){if(!state)return;const next=structuredClone(state),paths=new Map(synced.files.filter(x=>x.storagePath).map(x=>[x.id,x.storagePath]));next.files.forEach(file=>{if(paths.has(file.id))file.storagePath=paths.get(file.id)});await persist(next);state=next;render()}
+async function applyCloudState(next){await persist(next);state=next;if(!state.orgs.some(x=>x.id===ui.orgId)){ui.orgId=state.orgs[0]?.id||'';ui.projId=state.projects.find(x=>x.orgId===ui.orgId&&!x.archived)?.id||''}render()}
+const cloudAdapter={getState:()=>state,applyState:applyCloudState,render:()=>state&&render()};
 function navigate(section){
  if(section==='content'){location.href='./planner.html';return}
  ui.section=section;ui.query='';location.hash=section;render();
@@ -87,13 +93,12 @@ function download(blob,name){
 }
 async function viewFile(id){
  const x=state.files.find(v=>v.id===id);if(!x)return;
- const isData=typeof x.data==='string'&&/^data:[^,]*;base64,/.test(x.data);
- if(!isData)throw Error('Файл повреждён');
+ const source=x.data||await resolveCloudMediaUrl(x);
  let content;
- if(/^image\/(png|jpeg|gif|webp|avif|bmp)$/.test(x.type))content='<img class="preview" src="'+e(x.data)+'" alt="'+e(x.name)+'">';
- else if(x.type?.startsWith('video/'))content='<video class="preview" src="'+e(x.data)+'" controls></video>';
- else if(x.type?.startsWith('audio/'))content='<audio class="preview" src="'+e(x.data)+'" controls></audio>';
- else if(x.type==='application/pdf')content='<iframe class="file-preview" sandbox src="'+e(x.data)+'" title="Просмотр PDF"></iframe>';
+ if(/^image\/(png|jpeg|gif|webp|avif|bmp)$/.test(x.type))content='<img class="preview" src="'+e(source)+'" alt="'+e(x.name)+'">';
+ else if(x.type?.startsWith('video/'))content='<video class="preview" src="'+e(source)+'" controls></video>';
+ else if(x.type?.startsWith('audio/'))content='<audio class="preview" src="'+e(source)+'" controls></audio>';
+ else if(x.type==='application/pdf')content='<iframe class="file-preview" sandbox src="'+e(source)+'" title="Просмотр PDF"></iframe>';
  else content='<p>Для этого формата доступно скачивание.</p>';
  openDialog(x.name,content+'<div class="toolbar" style="margin-top:20px">'+b('download-file','↓ Скачать файл','data-id="'+e(id)+'"')+'</div>',null,true);
 }
@@ -121,6 +126,7 @@ document.addEventListener('click',async event=>{
  const btn=event.target.closest('[data-action]');if(!btn||!state)return;
  const {action,type,id,section,date,tab,filter,year}=btn.dataset;
  try{
+ if(action.startsWith('cloud-')){await handleCloudAction(action,cloudAdapter);return}
  if(action==='emoji'){const input=btn.closest('form')?.querySelector('[name=emoji]');if(input)input.value=btn.dataset.emoji}
  else if(action==='navigate')navigate(section);
  else if(action==='menu'){$('#sidebar').classList.toggle('open');btn.setAttribute('aria-expanded',String($('#sidebar').classList.contains('open')));}
@@ -156,7 +162,7 @@ document.addEventListener('click',async event=>{
  else if(action==='repair')confirmDialog('Восстановление','Удалить записи без родительского проекта или организации и восстановить справочники? Перед восстановлением рекомендуем экспортировать данные.',()=>commit(repair(state),'Связи восстановлены'));
  else if(action==='reset')confirmDialog('Очистка данных','Все данные новой версии на этом устройстве будут удалены. Скачайте резервную копию перед очисткой.',async()=>{await commit(defaults(),'Данные очищены');ui.orgId='';ui.projId='';render()});
  else if(action==='view-file')await viewFile(id);
- else if(action==='download-file'){const x=state.files.find(v=>v.id===id);if(x&&/^data:[^,]*;base64,/.test(x.data)){const raw=atob(x.data.split(',')[1]),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));download(new Blob([bytes],{type:x.type||'application/octet-stream'}),x.name)}}
+ else if(action==='download-file'){const x=state.files.find(v=>v.id===id);if(x&&/^data:[^,]*;base64,/.test(x.data)){const raw=atob(x.data.split(',')[1]),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));download(new Blob([bytes],{type:x.type||'application/octet-stream'}),x.name)}else if(x?.storagePath){const a=document.createElement('a');a.href=await resolveCloudMediaUrl(x);a.target='_blank';a.rel='noopener';a.download=x.name;a.click()}else throw Error('Файл недоступен')}
  else if(action==='assistant')assistant();
  }catch(err){toast(err.message)}
 });
@@ -195,10 +201,11 @@ async function init(){
  try{
  const result=await openStore();state=result.state;
  if(state.orgs.length){ui.orgId=state.orgs[0].id;ui.projId=state.projects.find(x=>x.orgId===ui.orgId&&!x.archived)?.id||''}
- render();if(result.migrated)toast('Данные предыдущей версии перенесены');
+ render();if(result.migrated)toast('Данные предыдущей версии перенесены');cloudInitialize().then(()=>render()).catch(()=>render());
  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>toast('Офлайн-кеш недоступен. Приложение продолжает работать онлайн.'));
  }catch(err){$('#app').innerHTML='<div class="boot"><h1>Не удалось открыть хранилище</h1><p>'+e(err.message)+'</p><p>Откройте приложение через локальный сервер в обычном окне браузера.</p><button onclick="location.reload()">Повторить</button></div>'}
 }
 init();
+addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());
 
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#modal').open){$('#sidebar')?.classList.remove('open');$('[data-action=menu]')?.setAttribute('aria-expanded','false');}});

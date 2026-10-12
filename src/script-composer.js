@@ -1,7 +1,7 @@
-import {uid} from './model.js?v=20261008-single-plan8';
-import {planScenes,scenarioText,planPreview,speakers} from './scenario-plan.js?v=20261008-single-plan8';
-import {escape as e,field,openDialog} from './ui.js?v=20261008-single-plan8';
-import {plannerState,newTopic,saveTopic,platforms} from './planner-model.js?v=20261008-single-plan8';
+import {uid} from './model.js?v=20261012-cloud1';
+import {planScenes,scenarioText,planPreview,speakers} from './scenario-plan.js?v=20261012-cloud1';
+import {escape as e,field,openDialog} from './ui.js?v=20261012-cloud1';
+import {plannerState,newTopic,saveTopic,platforms} from './planner-model.js?v=20261012-cloud1';
 export function scriptComposer(state,u,onSave){
  const topics=plannerState(state).topics.filter(t=>t.projId===u.projId),works=plannerState(state).works.filter(w=>w.projId===u.projId);
  const body='<div class="ai-composer"><section class="ai-brief">'+field('topicId','Тема','','text',[['','＋ Новая тема'],...topics.map(t=>[t.id,t.title])])+field('videoTopic','Тема видеоконтента','','textarea',null,true)+field('durationSeconds','Хронометраж, секунд','60','number',null,true)+field('speakerMode','Кто говорит','host','text',speakers)+'<label class="checkbox-line"><input type="checkbox" name="createScenes" checked>Создать начальный сценарий и сцены</label><details class="ai-options"><summary>Уточнения, факты и работы</summary>'+field('platform','Площадка','','text',[['','Не выбрана'],...Object.keys(platforms).map(p=>[p,p])])+field('format','Формат','','text',[['','Не выбран']])+field('audience','Для кого видео','','text')+field('facts','Подтверждённые факты','','textarea')+field('mustCapture','Обязательные кадры','','textarea')+works.map(w=>'<label class="checkbox-line"><input type="checkbox" name="workIds" value="'+e(w.id)+'">'+e(w.name)+'</label>').join('')+'<div class="field-pair">'+field('shootDate','Дата съёмки','','date')+field('deadline','Крайний срок съёмки','','date')+'</div></details><p class="ai-connection-note">AI не подключён. Начальный план собирается по шаблону и вашим данным. Технические факты и результат ремонта нужно проверить.</p></section><section class="ai-result"><h3>Предпросмотр сценария и сцен</h3><div class="scene-template-preview"></div><div class="ai-existing" hidden><h3>Текущий текст</h3><pre></pre></div></section></div>';

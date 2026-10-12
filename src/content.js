@@ -1,6 +1,6 @@
-import {content as legacy,monthGrid} from './views.js?v=20261008-single-plan8';
-import {escape as e,button as b,pretty,badge,empty} from './ui.js?v=20261008-single-plan8';
-import {weekHtml} from './planning.js?v=20261008-single-plan8';
+import {content as legacy,monthGrid} from './views.js?v=20261012-cloud1';
+import {escape as e,button as b,pretty,badge,empty} from './ui.js?v=20261012-cloud1';
+import {weekHtml} from './planning.js?v=20261012-cloud1';
 
 export const platforms=s=>[...s.socials,...['Instagram','Telegram','VK'].filter(name=>!s.socials.some(x=>x.name.toLowerCase()===name.toLowerCase())).map(name=>({id:'platform:'+name,name}))];
 export function selectedPosts(s,u){return s.posts.filter(x=>x.projId===u.projId&&(!u.postSocial||x.social===u.postSocial)&&(x.title+' '+(x.text||'')).toLowerCase().includes(u.query.toLowerCase())&&(!u.postStatus||x.status===u.postStatus)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));}

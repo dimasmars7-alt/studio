@@ -1,6 +1,6 @@
-import {seconds,timecode,timingLabel} from './scene-timing.js?v=20261008-single-plan8';
-import {escape as e,field,button as b,badge} from './ui.js?v=20261008-single-plan8';
-import {plannerState} from './planner-model.js?v=20261008-single-plan8';
+import {seconds,timecode,timingLabel} from './scene-timing.js?v=20261012-cloud1';
+import {escape as e,field,button as b,badge} from './ui.js?v=20261012-cloud1';
+import {plannerState} from './planner-model.js?v=20261012-cloud1';
 export const shotStatuses=['Запланирован','Снято','Переснять'];
 export const shotStatus=x=>shotStatuses.includes(x.status)?x.status:x.filmed?'Снято':'Запланирован';
 export function newShot(id){return {id,title:'',shots:'',plan:'',timeStart:'',timeEnd:'',speech:'',voiceOver:'',broll:'',overlay:'',audio:'',stage:'',status:'Запланирован',date:'',deadline:'',workIds:[],filmed:false,beforeWork:false,beforeNote:'',storyboardFileId:''};}

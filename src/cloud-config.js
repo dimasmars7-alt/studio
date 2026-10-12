@@ -1,7 +1,7 @@
 export const cloudConfig=Object.freeze({
- enabled:false,
- supabaseUrl:'',
- publishableKey:''
+ enabled:true,
+ supabaseUrl:'https://kdxxetrfxpwgzatostfa.supabase.co',
+ publishableKey:'sb_publishable_sYKY8BtYUk3ewdygDiMhRQ__bATXT08'
 });
 
 export function cloudConfigured(){

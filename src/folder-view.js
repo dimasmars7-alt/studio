@@ -1,7 +1,7 @@
-import {escape as e,button as b,badge} from './ui.js?v=20261008-single-plan8';
-import {editor} from './planner-view.js?v=20261008-single-plan8';
-import {moscowDate,addDays} from './planner-model.js?v=20261008-single-plan8';
-import {scope,owner,scopeFolders,scopeTopics,folderTopics,tableRows} from './folder-model.js?v=20261008-single-plan8';
+import {escape as e,button as b,badge} from './ui.js?v=20261012-cloud1';
+import {editor} from './planner-view.js?v=20261012-cloud1';
+import {moscowDate,addDays} from './planner-model.js?v=20261012-cloud1';
+import {scope,owner,scopeFolders,scopeTopics,folderTopics,tableRows} from './folder-model.js?v=20261012-cloud1';
 const date=d=>d?new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Moscow'}):'Без даты';
 const boardImage=(s,x)=>{const file=s.files.find(f=>f.id===x.storyboardFileId);return file&&/^data:image\/(png|jpeg|webp|gif|avif);base64,/.test(file.data||'')?'<img class="table-storyboard" src="'+e(file.data)+'" alt="'+e(file.name)+'">':'';};
 export function view(s,u){

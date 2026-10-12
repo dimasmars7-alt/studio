@@ -1,4 +1,4 @@
-import {defaults,normalize} from './model.js?v=20261008-single-plan8';
+import {defaults,normalize} from './model.js?v=20261012-cloud1';
 let db;
 export async function openStore(){
  db=await new Promise((resolve,reject)=>{

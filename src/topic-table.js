@@ -1,9 +1,9 @@
-import {escape as e,button as b,badge} from './ui.js?v=20261008-single-plan8';
-import {icon} from './icons.js?v=20261008-single-plan8';
-import {topicMetrics,topicNumber,shortDate} from './topic-metrics.js?v=20261008-single-plan8';
-import {nextAction,linkedShoots,ungroupedShoots} from './table-records.js?v=20261008-single-plan8';
-import {approval} from './planner-model.js?v=20261008-single-plan8';
-import {shotStatus} from './storyboard.js?v=20261008-single-plan8';
+import {escape as e,button as b,badge} from './ui.js?v=20261012-cloud1';
+import {icon} from './icons.js?v=20261012-cloud1';
+import {topicMetrics,topicNumber,shortDate} from './topic-metrics.js?v=20261012-cloud1';
+import {nextAction,linkedShoots,ungroupedShoots} from './table-records.js?v=20261012-cloud1';
+import {approval} from './planner-model.js?v=20261012-cloud1';
+import {shotStatus} from './storyboard.js?v=20261012-cloud1';
 
 const open=(t,label,tab='topic',cls='')=>b('topic-open',label,'data-id="'+e(t.id)+'" data-tab="'+tab+'"',cls);
 const fullDate=value=>value?shortDate(value)+' '+value.slice(0,4)+' г.':'Не назначена';

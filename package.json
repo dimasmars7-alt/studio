@@ -1,0 +1,9 @@
+{
+  "name": "tarusov-planner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/cloud-sync.test.mjs",
+    "check": "node tests/check-js.mjs"
+  }
+}
