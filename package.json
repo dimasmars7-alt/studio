@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/cloud-sync.test.mjs",
+    "test": "node tests/cloud-sync.test.mjs && node tests/project-overview.test.mjs && node tests/milena-project.test.mjs",
     "check": "node tests/check-js.mjs"
   }
 }

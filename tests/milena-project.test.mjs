@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {defaults} from '../src/model.js';
+import {ensureMilenaProject} from '../src/milena-project.js';
+
+const first=ensureMilenaProject(defaults());
+assert.equal(first.changed,true);
+const project=first.state.projects.find(x=>x.name==='Милена 7950');
+assert.ok(project);
+assert.equal(first.state.planner.works.filter(x=>x.projId===project.id).length,20);
+const topics=first.state.planner.topics.filter(x=>x.projId===project.id);
+assert.equal(topics.length,12);
+assert.equal(topics.filter(t=>t.taskStatus==='Материал снят').length,3);
+const demolition=topics.find(t=>t.title.includes('Рубка:'));
+assert.equal(demolition.workIds.length,3);
+assert.equal(demolition.scenes.length,7);
+assert.equal(demolition.scenes.filter(x=>x.beforeWork).length,3);
+const second=ensureMilenaProject(first.state);
+assert.equal(second.changed,false);
+assert.equal(second.state.projects.filter(x=>x.name==='Милена 7950').length,1);
+console.log('milena project tests passed');
