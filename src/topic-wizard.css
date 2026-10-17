@@ -1,0 +1,59 @@
+.topic-table-heading>.new-topic-button{min-height:44px;padding:10px 17px;border-radius:10px;background:linear-gradient(120deg,#7951fa,#5b31ed);border-color:#6840eb;box-shadow:0 5px 16px #653df02b;font-size:14px}
+#modal.topic-wizard-dialog{width:min(552px,100vw);max-width:552px;height:100dvh;max-height:100dvh;border:0;border-radius:0;background:#fff;color:#111d4c}
+#modal.topic-wizard-dialog::backdrop{background:rgba(20,34,75,.54)}
+#modal.topic-wizard-dialog form{height:100%;min-height:0;grid-template-rows:auto minmax(0,1fr) auto}
+#modal.topic-wizard-dialog form>header{padding:20px 28px 12px;border-bottom:0}
+#modal.topic-wizard-dialog form>header .eyebrow{display:none}
+#modal.topic-wizard-dialog form>header h2{margin:0;color:#0b1644;font-size:27px;line-height:1.2}
+#modal.topic-wizard-dialog #close-dialog{border:0;color:#22366e;font-size:27px}
+#modal.topic-wizard-dialog .dialog-body{min-height:0;padding:0 28px 20px;overflow-y:auto}
+.topic-wizard-head>p{margin:0 0 17px;color:#5470ae;font-size:14px}
+.topic-wizard-steps{gap:12px;margin-bottom:24px}
+.topic-wizard-steps span{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:#536ba6}
+.topic-wizard-steps span:after{display:none}
+.topic-wizard-steps b{flex:none;width:34px;height:34px;border:1px solid #d7e4f8;background:#f0f5ff;color:#4262ae}
+.topic-wizard-steps span.active b{border-color:#6638f4;background:#6638f4;color:#fff;box-shadow:0 5px 14px #6638f43d}
+.topic-wizard-steps span.completed b{border-color:#a891ff;background:#eee9ff;color:#5934d9}
+.topic-wizard-page .field{display:grid;gap:6px;margin-bottom:15px;color:#172653;font-size:13px;font-weight:600}
+.topic-wizard-page input:not([type=checkbox]):not([type=radio]),.topic-wizard-page select,.topic-wizard-page textarea{width:100%;min-height:42px;border:1px solid #d4e1f5;border-radius:8px;background:#fff;color:#132555;font-size:14px;font-weight:400}
+.topic-wizard-page textarea{min-height:72px;resize:vertical}
+.topic-field-hint{margin:-11px 0 17px;color:#6c81b0;font-size:11px}
+.topic-field-label{margin:3px 0 9px;font-size:13px;font-weight:600;color:#172653}
+.content-type-picker{margin:0 0 16px}
+.content-type-picker label{min-width:0}
+.content-type-picker span{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:8px 5px;border:1px solid #d4e1f5;border-radius:8px;color:#425c96;font-size:13px;cursor:pointer}
+.content-type-picker .ui-icon{width:18px;height:18px}
+.content-type-picker input:checked+span{border-color:#6739f4;background:#f3f0ff;color:#5a31e2;box-shadow:inset 0 0 0 1px #6739f4}
+.topic-wizard-page .field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.topic-extra{margin:0 0 14px;padding:10px 12px;border-color:#d6e3f7}
+.topic-extra>summary{display:flex;align-items:center;gap:8px;min-height:28px;color:#1b2e66;font-size:14px}
+.topic-extra>summary .ui-icon{width:17px;height:17px;color:#4d43bb}
+.topic-extra[open]>.field-pair{margin-top:12px}
+.topic-extra .field{margin-bottom:10px}
+.topic-priority{display:flex;align-items:end;gap:0;margin:0 0 10px;padding:0;border:0}
+.topic-priority legend{margin-bottom:6px;color:#172653;font-size:13px;font-weight:600}
+.topic-priority label{flex:1;cursor:pointer}
+.topic-priority input{position:absolute;opacity:0}
+.topic-priority span{display:block;padding:10px 5px;border:1px solid #d4e1f5;text-align:center;color:#5168a0;font-size:12px}
+.topic-priority label:first-of-type span{border-radius:7px 0 0 7px}
+.topic-priority label:last-of-type span{border-radius:0 7px 7px 0}
+.topic-priority input:checked+span{position:relative;border-color:#6a3dfa;background:#f3efff;color:#5730e4}
+.topic-linked-works{margin:4px 0 12px;padding:9px;border:1px solid #d8e5f7;border-radius:8px}
+.topic-linked-works legend{padding:0 5px;color:#172653;font-size:13px;font-weight:600}
+.topic-linked-works>div{display:flex;gap:7px;flex-wrap:wrap;max-height:104px;overflow:auto}
+.topic-linked-works label{display:flex;align-items:center;gap:6px;padding:5px 7px;border:1px solid #dce7f8;border-radius:7px;font-size:12px;color:#36518c;cursor:pointer}
+.topic-linked-works input{width:16px;height:16px;min-height:16px;accent-color:#6739f4}
+.platform-check-grid{grid-template-columns:1fr;gap:9px}
+.platform-option{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px;align-items:center;padding:9px;border:1px solid #dbe6f7;border-radius:10px}
+.platform-option:has(input:checked){border-color:#a994ff;background:#f7f5ff}
+.platform-option label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.platform-option label>span{display:grid;padding:0;border:0}
+.platform-option input{position:static;opacity:1;width:18px;height:18px;min-height:18px;accent-color:#6638f4}
+.platform-option strong{font-size:14px}.platform-option small{font-size:11px}
+.platform-option select{min-height:38px!important;font-size:12px!important}
+#modal.topic-wizard-dialog form>footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e2eaf7;background:#fff}
+#modal.topic-wizard-dialog form>footer button{min-height:42px;padding:9px 12px;font-size:12px;white-space:nowrap}
+#modal.topic-wizard-dialog form>footer .wizard-later{margin-right:auto;padding-left:0;border:0;background:transparent;color:#6237f4}
+#modal.topic-wizard-dialog form>footer .wizard-back{border:0;background:transparent}
+#modal.topic-wizard-dialog form>footer .wizard-next,#modal.topic-wizard-dialog form>footer [type=submit]{background:linear-gradient(120deg,#7951fa,#5b31ed);color:#fff;border-color:#6840eb}
+@media(max-width:600px){#modal.topic-wizard-dialog form>header{padding:18px 16px 10px}#modal.topic-wizard-dialog .dialog-body{padding:0 16px 18px}.topic-wizard-steps{gap:4px}.topic-wizard-steps span{font-size:10px}.topic-wizard-steps b{width:28px;height:28px}.topic-wizard-page .field-pair{grid-template-columns:1fr;gap:0}.content-type-picker{grid-template-columns:repeat(2,1fr)}.platform-option{grid-template-columns:1fr}.platform-option select{width:100%}#modal.topic-wizard-dialog form>footer{display:grid;grid-template-columns:1fr 1fr;padding:9px 12px}#modal.topic-wizard-dialog form>footer .wizard-later{grid-column:1/-1;text-align:left}#modal.topic-wizard-dialog form>footer button{white-space:normal}}
