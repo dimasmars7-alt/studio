@@ -82,7 +82,7 @@ export function projectOverview(s,u,topics,tableHtml){
   +summaryCard('cal','Ближайшая съёмка',shoot?fullDate(shoot.date)+(time?', '+time:''):'Не назначена',shoot?.topic.title||'Добавьте дату съёмки',shootBody)
   +summaryCard('megaphone','Ближайшая публикация',post?fullDate(post.date):'Не назначена',post?(post.variant.platform||'Площадка')+' · '+post.topic.title:'Добавьте публикацию',postBody)
   +summaryCard('warning','Важные кадры',critical.length+' до демонтажа',critical.length?'Нельзя восстановить позже':'Все обязательные кадры сняты',critical.length?topicButton(critical[0].topic,'Открыть важные кадры','scenes','summary-hit'):'','warning')
-  +summaryCard('play','Следующий шаг','','',nextButton(data.next),'next')
+  +summaryCard('play','Следующий шаг',data.next?.topic.title||'', '',nextButton(data.next),'next')
   +'</section>';
  return cards+'<div class="overview-layout"><div>'+projectProgress(s,u,topics)+nearTopics(s,u,topics)+'</div>'+overviewSide(s,u,topics,data)+'</div><section class="ai-version-strip"><span>✦ Из одной темы AI подготовит версии для VK, Telegram, Reels, Shorts и YouTube</span>'+b('view','Создать версии публикации','data-view="scripts"','primary')+'</section>';
 }

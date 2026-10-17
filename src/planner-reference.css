@@ -113,3 +113,25 @@ body{background:radial-gradient(circle at 58% 6%,#e8f5ff 0,transparent 48%),#f5f
  .week-timeline time{padding-top:5px;font-size:10px}.week-timeline i{margin-top:8px}.week-timeline-event{min-height:34px;padding:3px 0;border:0;background:transparent;color:#263d7f;text-align:left;font-size:12px}
  .week-timeline-event span,.week-timeline-event small{display:block}.week-timeline-event small{color:#7c8cb5}
 }
+
+/* Keep overview content in the card flow when real project titles are long. */
+@media(min-width:781px){
+ .project-summary-card{height:auto;min-height:132px;grid-template-columns:66px minmax(0,1fr);grid-template-rows:auto;align-content:center;overflow:visible}
+ .project-summary-card>div{min-width:0;align-self:center}
+ .project-summary-card strong{white-space:normal;overflow-wrap:anywhere;line-height:1.2}
+ .project-summary-card p{min-height:0;margin:5px 0 0;white-space:normal;overflow-wrap:anywhere}
+ .project-summary-card.next{grid-template-columns:58px minmax(0,1fr);grid-template-rows:auto auto;align-content:center}
+ .project-summary-card.next .summary-icon{grid-row:1 / span 2}
+ .project-summary-card.next>div{position:static;min-width:0;align-self:end}
+ .project-summary-card.next strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:17px}
+ .project-summary-card.next p:empty{display:none}
+ .project-summary-card.next>.overview-action,.project-summary-card.next>.overview-complete{grid-column:2;align-self:start;justify-self:start;width:auto;max-width:100%;min-height:40px;margin:9px 0 0;padding:8px 14px;white-space:normal;line-height:1.25}
+}
+@media(min-width:781px) and (max-width:1500px){
+ .project-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:1181px) and (max-width:1500px){
+ .planner-project-heading{min-height:auto;padding-right:0}
+ .header-context{position:relative;top:auto;right:auto;width:min(100%,816px);margin:16px 0 12px}
+ .planner-project-tabs{margin-top:0}
+}

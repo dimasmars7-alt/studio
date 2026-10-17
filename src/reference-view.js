@@ -8,7 +8,7 @@ import {escape as e,button as b,badge} from './ui.js?v=20261014-planner2';
 import {editor} from './planner-view.js?v=20261017-v1';
 import {plannerState,moscowDate,addDays,platforms} from './planner-model.js?v=20261014-planner2';
 import {scopeFolders} from './folder-model.js?v=20261014-planner2';
-import {projectOverview} from './project-overview.js?v=20261015-v4';
+import {projectOverview} from './project-overview.js?v=20261017-v2';
 import {icon} from './icons.js?v=20261012-cloud1';
 import {cloudStatus} from './cloud-sync.js?v=20261012-cloud1';
 const date=d=>d?new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:'Europe/Moscow'}):'Без даты';
