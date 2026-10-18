@@ -11,12 +11,13 @@ import {openStore,persist} from './storage.js?v=20261014-planner2';
 import {uid,normalize,removeEntity} from './model.js?v=20261014-planner2';
 import {escape as e,field,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261014-planner2';
 import {editor} from './planner-view.js?v=20261017-topic2';
-import {view} from './reference-view.js?v=20261018-progress1';
+import {view} from './reference-view.js?v=20261018-import1';
 import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261014-planner2';
 import {platforms,plannerState,newTopic,importLegacy,saveTopic,moscowDate,addDays,validDate} from './planner-model.js?v=20261014-planner2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261014-planner2';
 import {handleCloudAction} from './cloud-ui.js?v=20261014-planner2';
 import {ensureMilenaProject} from './milena-project.js?v=20261015-v2';
+import {readProjectPackage,mergeProjectPackage} from './project-package.js?v=20261018-import1';
 import {projectPhotoManager,topicMediaManager,fileRecords} from './media-manager.js?v=20261015-v2';
 let state,busy=false,aiAbort=null,aiRun=0;
 const u={navScope:'projects',folderId:'',orgId:'',projId:'',archive:false,view:'overview',calendarMode:'week',calendarDate:moscowDate(),channel:'',scriptEdits:{},scriptTopic:'',scriptSource:'questions',tableFilter:'all',tableTaskStatus:'',tableDate:null,boardTopic:'',boardFilter:'all',calendarMonth:moscowDate().slice(0,7)+'-01',week:moscowDate(),draft:null,dirty:false,editorTab:'topic',topicEditing:false,scriptEditing:false,sceneEditing:false,selectedSceneId:'',selectedVariantId:'',variantMediaOpen:false,wizard:false,wizardStep:0};
@@ -156,6 +157,7 @@ document.addEventListener('click',async event=>{const dateCell=event.target.clos
  else if(action==='org-create')guard(()=>entity('orgs'));
  else if(action==='org-edit')guard(()=>entity('orgs',state.orgs.find(x=>x.id===u.orgId)));
  else if(action==='project-create')guard(()=>entity('projects'));
+ else if(action==='project-package-import')guard(()=>$('#project-package-input')?.click());
  else if(action==='project-edit')guard(()=>entity('projects',state.projects.find(x=>x.id===u.projId)));
  else if(action==='project-photos')openProjectPhotos();
  else if(action==='topic-media'){if(!plannerState(state).topics.some(x=>x.id===id)){toast('Сначала сохраните новую тему, затем добавьте материалы.');return;}openTopicMedia(id);}
@@ -203,6 +205,17 @@ document.addEventListener('change',async event=>{const el=event.target;try{if(el
   if(el.hasAttribute('data-table-prep')){const record=topic.preparation.find(x=>x.id===el.dataset.tablePrep);if(!record)return;record.done=el.checked;}else topic.approval=el.value;
   await commit(saveTopic(state,topic));return;
  }if(el.id==='shoot-date'){const value=el.value;el.value=u.shootDate||'';guard(()=>{u.shootDate=value;u.shootSelected='';u.shootNoteDraft=null;u.shootDetail=false;render()});return;}
+ if(el.id==='project-package-input'){
+  const file=el.files[0];el.value='';if(!file)return;
+  if(file.size>5*1024*1024)throw Error('Пакет проектов должен быть не больше 5 МБ');
+  const packageData=readProjectPackage(await file.text()),preview=mergeProjectPackage(state,packageData).summary;
+  const names=packageData.projects.map(item=>item.project.name).join(', ');
+  confirm('Добавить проекты',names+'. Будет добавлено: '+preview.projects+' проектов, '+preview.works+' работ, '+preview.topics+' тем. Существующие записи сохранятся.',async()=>{
+   const {state:next,summary}=mergeProjectPackage(state,packageData),project=next.projects.find(item=>item.id===summary.firstProjectId);
+   u.draft=null;u.dirty=false;u.orgId=project?.orgId||u.orgId;u.projId=project?.id||u.projId;u.archive=false;u.view='overview';
+   await commit(next,'Добавлено проектов: '+summary.projects+' · тем: '+summary.topics);
+  },'Добавить проекты');return;
+ }
  if(el.id==='project-file-upload'){const projId=u.projId,files=[...el.files];if(!files.length)return;if(files.length>30||files.reduce((sum,x)=>sum+x.size,0)>100*1024*1024)throw Error('За один раз — до 30 файлов и 100 МБ');if(files.some(x=>x.size>20*1024*1024))throw Error('Максимум 20 МБ на файл');const records=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({id:uid(),projId,name:file.name,type:file.type,size:file.size,data:reader.result});reader.onerror=()=>reject(Error('Не удалось прочитать файл'));reader.readAsDataURL(file);})));if(!state.projects.some(p=>p.id===projId))throw Error('Проект не найден');const next=structuredClone(state);next.files.push(...records);await commit(next,'Прикреплено файлов: '+records.length);return;}
  if(el.id==='project-photo-upload'){const records=await fileRecords(el.files,u.projId);if(!records.length)return;const next=structuredClone(state);next.files.push(...records);const project=next.projects.find(x=>x.id===u.projId);if(project&&!project.coverFileId)project.coverFileId=records.find(x=>/^image\//.test(x.type))?.id||'';await commit(next,'Фотографии проекта добавлены');openProjectPhotos();return;}
  if(el.classList.contains('topic-photo-upload')){const topicId=el.dataset.topic,stage=el.dataset.stage,records=await fileRecords(el.files,u.projId,topicId,stage);if(!records.length)return;const next=structuredClone(state);next.files.push(...records);await commit(next,'Материалы темы добавлены');openTopicMedia(topicId);return;}

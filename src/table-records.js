@@ -11,6 +11,7 @@ export function ungroupedShoots(s,projId){
  return s.shoots.filter(x=>x.projId===projId&&!ids.has(x.id));
 }
 export function nextAction(t){
+ if(t.taskStatus==='На паузе')return {label:'На паузе',tab:'topic',note:'Продолжим после решения по проекту',paused:true};
  const pending=t.scenes.filter(x=>shotStatus(x)!=='Снято'),prep=t.preparation.filter(x=>!x.done),unpublished=t.variants.filter(v=>v.ready!=='Опубликовано');
  const critical=pending.filter(x=>x.beforeWork);
  if(critical.length)return {label:'Снять до начала работы',tab:'scenes',note:'Критичных сцен: '+critical.length+' · '+critical.map(x=>x.title).join(', '),critical:true};

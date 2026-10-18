@@ -12,7 +12,7 @@ const media=(s,t)=>s.files.filter(f=>f.projId===t.projId&&f.topicId===t.id);
 const picture=(s,x)=>s.files.find(f=>f.id===x.storyboardFileId);
 const urgent=t=>t.scenes.filter(x=>x.beforeWork&&shotStatus(x)!=='Снято');
 const nextDate=t=>[...t.scenes.filter(x=>shotStatus(x)!=='Снято').map(x=>x.date),...t.variants.filter(x=>x.ready!=='Опубликовано').map(x=>x.date)].filter(Boolean).sort()[0]||'';
-const statuses=['Запланировано','Подготовка','В работе','На согласовании','Материал снят','Ожидает погоды','Готово'];
+const statuses=['Запланировано','Подготовка','В работе','На согласовании','Материал снят','Ожидает погоды','На паузе','Готово'];
 const goals=['Показать экспертность','Показать процесс','Объяснить работу','Показать результат'];
 const types=['Видео','Фото','Пост','Статья'];
 const stageName=x=>x==='В процессе'?'Процесс':x||'Этап не выбран';
