@@ -130,6 +130,10 @@ body{background:radial-gradient(circle at 58% 6%,#e8f5ff 0,transparent 48%),#f5f
 }
 @media(min-width:781px) and (max-width:1500px){
  .project-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .project-milestones{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}
+ .project-milestones>div{min-height:58px;padding:9px 8px 8px 38px;border:1px solid #dce5f7;border-radius:9px;text-align:left}
+ .project-milestones>div:before{display:none}
+ .project-milestones i{top:12px;left:11px}
 }
 @media(min-width:1181px) and (max-width:1500px){
  .planner-project-heading{min-height:auto;padding-right:0}
