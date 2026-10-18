@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/cloud-sync.test.mjs && node tests/project-overview.test.mjs && node tests/milena-project.test.mjs",
+    "preview": "node tools/preview-server.mjs",
+    "test": "node tests/cloud-sync.test.mjs && node tests/project-overview.test.mjs && node tests/milena-project.test.mjs && node tests/topic-wizard.test.mjs && node tests/topic-editor-v2.test.mjs",
     "check": "node tests/check-js.mjs"
   }
 }
