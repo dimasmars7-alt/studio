@@ -8,7 +8,7 @@ import {escape as e,button as b,badge} from './ui.js?v=20261014-planner2';
 import {editor} from './planner-view.js?v=20261017-topic2';
 import {plannerState,moscowDate,addDays,platforms} from './planner-model.js?v=20261014-planner2';
 import {scopeFolders} from './folder-model.js?v=20261014-planner2';
-import {projectOverview} from './project-overview.js?v=20261017-v2';
+import {projectOverview} from './project-overview.js?v=20261018-progress1';
 import {icon} from './icons.js?v=20261012-cloud1';
 import {cloudStatus} from './cloud-sync.js?v=20261012-cloud1';
 const date=d=>d?new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:'Europe/Moscow'}):'Без даты';
@@ -37,7 +37,7 @@ export function view(s,u){
  h+='<nav class="planner-project-tabs" aria-label="Разделы проекта">'+[['overview','chart','Обзор проекта'],['table','table','Таблица контента'],['scripts','sparkles','AI-сценарий'],['shooting','camera','На съёмке']].map(([v,symbol,label])=>v==='shooting'?b('shoot-open',icon(symbol)+' '+label,'aria-pressed="false"'):b('view',icon(symbol)+' '+label,'data-view="'+v+'" aria-pressed="'+(mode===v)+'"',mode===v?'active':'')).join('')+'</nav>'+(mode==='overview'||mode==='table'?'':'<div class="reference-controls planner-v2-controls"><input id="reference-search" type="search" aria-label="Поиск тем" placeholder="Поиск тем…"></div>');
  if(folders.length)h+='<div class="optional-folder"><label>Папка <select data-select="folderId"><option value="">Все темы проекта</option>'+folders.map(f=>'<option value="'+e(f.id)+'" '+(f.id===u.folderId?'selected':'')+'>'+e(f.name)+'</option>').join('')+'</select></label>'+b('folder-create','＋ Папка')+'</div>';
  h+='<section class="reference-surface" id="plan-list">';
- if(mode==='overview')h+=projectOverview(s,u,topics,detailedTable(s,topics,createMenu,u,[...new Set([...Object.keys(platforms),...channels])]));
+ if(mode==='overview')h+=projectOverview(s,u,all,detailedTable(s,all,createMenu,u,[...new Set([...Object.keys(platforms),...channels])]));
  if(mode==='boards')h+=projectBoards(s,u);
  if(mode==='scripts')h+=pdfScenarioWorkspace(s,u,topics);
  if(mode==='table')h+=detailedTable(s,topics,createMenu,u,[...new Set([...Object.keys(platforms),...channels])]);

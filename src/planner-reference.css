@@ -44,6 +44,7 @@ body{background:radial-gradient(circle at 58% 6%,#e8f5ff 0,transparent 48%),#f5f
 .dual-progress b{color:#3d61f4;font-size:13px}
 .works-source-link{display:inline-flex;align-items:center;gap:7px;color:#536bcc}.works-source-link .ui-icon{width:17px;height:17px;color:#376cff}
 .project-milestones .done i{background:#0eb476;border-color:#0eb476}.project-milestones .active i{background:#6c3cef;border-color:#6c3cef}
+.project-milestones{grid-template-columns:repeat(var(--milestone-count,5),minmax(0,1fr))}.project-milestones strong{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}.project-stage-empty{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;padding:16px;border:1px dashed #cbd9f3;border-radius:12px;background:#f8faff}.project-stage-empty p{margin:0;color:#566991}.project-stage-empty button{flex:none}.project-stage-count{margin:10px 0 0;color:#7181a5;font-size:12px}
 .project-milestones .active i:after{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}.project-milestones .active:before{background:#16bb7b}
 .near-topics h2,.overview-side h2,.v2-project-progress h2{color:#0b1744;font-weight:800}
 .near-topic-head{color:#4f66a5}.near-topic-row{border-color:#e0eafb}.near-topic-row>b{color:#586fc1}
@@ -135,3 +136,4 @@ body{background:radial-gradient(circle at 58% 6%,#e8f5ff 0,transparent 48%),#f5f
  .header-context{position:relative;top:auto;right:auto;width:min(100%,816px);margin:16px 0 12px}
  .planner-project-tabs{margin-top:0}
 }
+@media(max-width:600px){.project-stage-empty{align-items:stretch;flex-direction:column}.project-stage-empty button{width:100%}}
