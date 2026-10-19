@@ -49,10 +49,27 @@ export async function signIn(email,password){
  saveSession(result);return authState();
 }
 
-export async function signUp(email,password){
- const result=await authRequest('signup',{method:'POST',body:JSON.stringify({email:String(email||'').trim(),password:String(password||'')})});
+export async function signUp(email,password,displayName=''){
+ const result=await authRequest('signup',{method:'POST',body:JSON.stringify({email:String(email||'').trim(),password:String(password||''),data:{display_name:String(displayName||'').trim()}})});
  if(result?.access_token&&result?.refresh_token)saveSession(result);
  return {state:authState(),confirmationRequired:!result?.access_token,user:result?.user||null};
+}
+
+export async function getProfile(){
+ if(!session?.user?.id)throw Error('Сначала войдите в аккаунт');
+ const rows=await api('/rest/v1/profiles?select=id,display_name,avatar_path&id=eq.'+encodeURIComponent(session.user.id));
+ return rows?.[0]||null;
+}
+
+export async function updateProfile(displayName){
+ if(!session?.user?.id)throw Error('Сначала войдите в аккаунт');
+ const name=String(displayName||'').trim();
+ if(name.length<2||name.length>120)throw Error('Укажите имя длиной от 2 до 120 символов');
+ const rows=await api('/rest/v1/profiles?id=eq.'+encodeURIComponent(session.user.id),{
+  method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({display_name:name})
+ });
+ if(!rows?.[0])throw Error('Не удалось сохранить профиль');
+ return rows[0];
 }
 
 export async function refreshSession(){

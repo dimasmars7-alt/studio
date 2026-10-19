@@ -1,12 +1,12 @@
 import {cloudConfigured} from './cloud-config.js';
-import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl} from './cloud-client.js';
+import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile} from './cloud-client.js';
 import {organizationSnapshot,mergeOrganizationSnapshot} from './cloud-state.js';
 import {normalize} from './model.js?v=20261012-cloud1';
 
 const mapKey='tarusov-planner-cloud-organizations';
 const versionKey='tarusov-planner-cloud-versions';
 const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-let runtime={phase:'idle',message:'',lastSync:'',members:[]},timer=null;
+let runtime={phase:'idle',message:'',lastSync:'',members:[],profile:null},timer=null;
 const mediaUrls=new Map();
 
 function readObject(key){try{const value=JSON.parse(localStorage.getItem(key)||'{}');return value&&typeof value==='object'&&!Array.isArray(value)?value:{}}catch{return {}}}
@@ -19,10 +19,12 @@ function filePath(cloudId,file){const clean=String(file.name||'file').replace(/[
 function dataBlob(value,type){const match=String(value||'').match(/^data:([^;,]+)(?:;[^;,]+)*;base64,(.*)$/s);if(!match)throw Error('Файл не удалось подготовить для облака');const raw=atob(match[2]),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:type||match[1]||'application/octet-stream'})}
 
 export function cloudStatus(){const auth=authState();return {...auth,...runtime,configured:cloudConfigured(),mappedCount:Object.keys(readObject(mapKey)).length}}
-export async function cloudInitialize(){if(!cloudConfigured())return cloudStatus();if(authState().signedIn){try{await refreshSession();runtime.members=await listOrganizations()}catch(error){update({phase:'error',message:error.message})}}return cloudStatus()}
-export async function cloudSignIn(email,password){update({phase:'working',message:'Входим…'});try{const result=await signIn(email,password);runtime.members=await listOrganizations();update({phase:'ready',message:'Вход выполнен'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
-export async function cloudSignUp(email,password){update({phase:'working',message:'Создаём аккаунт…'});try{const result=await signUp(email,password);if(result.state.signedIn)runtime.members=await listOrganizations();update({phase:result.confirmationRequired?'notice':'ready',message:result.confirmationRequired?'Подтвердите адрес по письму Supabase':'Аккаунт создан'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
-export async function cloudSignOut(){await signOut();runtime={phase:'idle',message:'Вы вышли из облака',lastSync:'',members:[]};dispatchEvent(new CustomEvent('planner-cloud-sync',{detail:cloudStatus()}));}
+async function loadAccount(){runtime.members=await listOrganizations();try{runtime.profile=await getProfile()}catch{runtime.profile=null}}
+export async function cloudInitialize(){if(!cloudConfigured())return cloudStatus();if(authState().signedIn){try{await refreshSession();await loadAccount()}catch(error){update({phase:'error',message:error.message})}}return cloudStatus()}
+export async function cloudSignIn(email,password){update({phase:'working',message:'Входим…'});try{const result=await signIn(email,password);await loadAccount();update({phase:'ready',message:runtime.profile?'Вход выполнен':'Вход выполнен. Профиль Supabase пока недоступен'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
+export async function cloudSignUp(email,password,displayName=''){update({phase:'working',message:'Создаём аккаунт…'});try{const result=await signUp(email,password,displayName);if(result.state.signedIn)await loadAccount();update({phase:result.confirmationRequired?'notice':'ready',message:result.confirmationRequired?'Подтвердите адрес по письму Supabase':'Аккаунт создан'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
+export async function cloudSaveProfile(displayName){const profile=await updateProfile(displayName);update({profile,message:'Имя сохранено'});return profile}
+export async function cloudSignOut(){await signOut();runtime={phase:'idle',message:'Вы вышли из облака',lastSync:'',members:[],profile:null};dispatchEvent(new CustomEvent('planner-cloud-sync',{detail:cloudStatus()}));}
 
 async function uploadSnapshotFiles(next,envelope,cloudId){
  for(const copy of envelope.state.files||[]){

@@ -2,11 +2,11 @@ import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=2
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
 import {openStore,persist} from './storage.js?v=20261012-cloud1';
 import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261012-cloud1';
-import * as views from './views.js?v=20261012-cloud1';
+import * as views from './views.js?v=20261018-account1';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261012-cloud1';
-import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261012-cloud1';
-import {handleCloudAction} from './cloud-ui.js?v=20261012-cloud1';
+import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261018-account1';
+import {handleCloudAction} from './cloud-ui.js?v=20261018-account1';
 let state,busy=false;
 const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
 const $=s=>document.querySelector(s);

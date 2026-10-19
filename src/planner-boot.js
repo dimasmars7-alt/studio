@@ -10,6 +10,6 @@ if(location.protocol==='file:'){
  panel.append(title,note,link,local);container.append(panel);
 }else{
  window.addEventListener('error',event=>showFailure(event.error||event.message));window.addEventListener('unhandledrejection',event=>showFailure(event.reason));
- import('./planner-app.js?v=20261018-import1').catch(showFailure);
+ import('./planner-app.js?v=20261018-account1').catch(showFailure);
 }
 

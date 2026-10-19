@@ -1,6 +1,6 @@
 import {shootingView} from './shooting-mode.js?v=20261014-planner2';
 import {projectColor} from './project-colors.js?v=20261014-planner2';
-import {siteNav} from './workspace-shell.js?v=20261014-planner2';
+import {siteNav} from './workspace-shell.js?v=20261018-account1';
 import {contentCalendar} from './content-calendar.js?v=20261014-planner2';
 import {detailedTable,projectAssets} from './project-assets.js?v=20261016-v3';
 import {projectBoards,scriptBoards} from './storyboard.js?v=20261014-planner2';
@@ -10,7 +10,7 @@ import {plannerState,moscowDate,addDays,platforms} from './planner-model.js?v=20
 import {scopeFolders} from './folder-model.js?v=20261014-planner2';
 import {projectOverview} from './project-overview.js?v=20261018-progress1';
 import {icon} from './icons.js?v=20261012-cloud1';
-import {cloudStatus} from './cloud-sync.js?v=20261012-cloud1';
+import {cloudStatus} from './cloud-sync.js?v=20261018-account1';
 const date=d=>d?new Date(d+'T12:00Z').toLocaleDateString('ru-RU',{day:'numeric',month:'short',timeZone:'Europe/Moscow'}):'Без даты';
 const pick=(key,label,id,items,add)=>'<label class="field">'+label+'<select data-select="'+key+'" aria-label="'+label+'"><option value="">Выберите</option>'+items.map(x=>'<option value="'+e(x.id)+'" '+(x.id===id?'selected':'')+'>'+e(x.name)+'</option>').join('')+'<option value="__add__">＋ '+add+'</option></select></label>';
 const channel=t=>[...new Set(t.variants.map(v=>v.platform))].filter(Boolean);
