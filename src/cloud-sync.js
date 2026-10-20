@@ -1,5 +1,5 @@
 import {cloudConfigured} from './cloud-config.js';
-import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile} from './cloud-client.js';
+import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js';
 import {organizationSnapshot,mergeOrganizationSnapshot} from './cloud-state.js';
 import {normalize} from './model.js?v=20261012-cloud1';
 
@@ -25,6 +25,23 @@ export async function cloudSignIn(email,password){update({phase:'working',messag
 export async function cloudSignUp(email,password,displayName=''){update({phase:'working',message:'Создаём аккаунт…'});try{const result=await signUp(email,password,displayName);if(result.state.signedIn)await loadAccount();update({phase:result.confirmationRequired?'notice':'ready',message:result.confirmationRequired?'Подтвердите адрес по письму Supabase':'Аккаунт создан'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
 export async function cloudSaveProfile(displayName){const profile=await updateProfile(displayName);update({profile,message:'Имя сохранено'});return profile}
 export async function cloudSignOut(){await signOut();runtime={phase:'idle',message:'Вы вышли из облака',lastSync:'',members:[],profile:null};dispatchEvent(new CustomEvent('planner-cloud-sync',{detail:cloudStatus()}));}
+
+export async function cloudPublishCatalog(organizationId){
+ if(!authState().signedIn)throw Error('Сначала войдите в облако');
+ const row=runtime.members.find(item=>item.organization_id===organizationId&&item.role==='owner');
+ if(!row)throw Error('Публичную ссылку может включить только владелец организации');
+ const token=await publishOrganizationCatalog(organizationId);
+ update({message:'Публичная ссылка включена'});
+ return new URL('./public.html?catalog='+encodeURIComponent(token),location.href).href;
+}
+
+export async function cloudUnpublishCatalog(organizationId){
+ if(!authState().signedIn)throw Error('Сначала войдите в облако');
+ const row=runtime.members.find(item=>item.organization_id===organizationId&&item.role==='owner');
+ if(!row)throw Error('Публичную ссылку может отключить только владелец организации');
+ await unpublishOrganizationCatalog(organizationId);
+ update({message:'Публичная ссылка отключена'});
+}
 
 async function uploadSnapshotFiles(next,envelope,cloudId){
  for(const copy of envelope.state.files||[]){

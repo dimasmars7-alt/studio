@@ -7,6 +7,7 @@ on:
       - '.github/workflows/reg-ru.yml'
       - 'index.html'
       - 'planner.html'
+      - 'public.html'
       - 'manifest.json'
       - 'sw.js'
       - '.htaccess'
@@ -95,7 +96,7 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF" = refs/heads/main || { echo 'Публикация разрешена только из main'; exit 1; }
           mkdir -p "$RUNNER_TEMP/site"
-          for file in .htaccess index.html planner.html manifest.json sw.js icon-192.png icon-512.png; do
+          for file in .htaccess index.html planner.html public.html manifest.json sw.js icon-192.png icon-512.png; do
             test -f "$file"
             cp "$file" "$RUNNER_TEMP/site/"
           done

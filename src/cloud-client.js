@@ -128,3 +128,28 @@ export async function createSignedMediaUrl(path,expiresIn=900){
   method:'POST',body:JSON.stringify({expiresIn:Math.max(60,Math.min(3600,Number(expiresIn)||900))})
  });
 }
+
+export async function publishOrganizationCatalog(organizationId){
+ return api('/rest/v1/rpc/publish_organization_catalog',{
+  method:'POST',body:JSON.stringify({p_organization_id:organizationId})
+ });
+}
+
+export async function unpublishOrganizationCatalog(organizationId){
+ return api('/rest/v1/rpc/unpublish_organization_catalog',{
+  method:'POST',body:JSON.stringify({p_organization_id:organizationId})
+ });
+}
+
+export async function getPublicCatalog(shareToken){
+ requireConfig();
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(shareToken))
+  throw Error('Некорректная публичная ссылка');
+ const response=await fetch(cloudConfig.supabaseUrl+'/rest/v1/rpc/get_public_catalog',{
+  method:'POST',headers:{apikey:cloudConfig.publishableKey,'Content-Type':'application/json'},
+  body:JSON.stringify({p_share_token:shareToken})
+ });
+ const catalog=await parse(response);
+ if(!catalog||!Array.isArray(catalog.projects))throw Error('Публичная ссылка не найдена или отключена');
+ return catalog;
+}

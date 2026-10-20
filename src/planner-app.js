@@ -14,8 +14,8 @@ import {editor} from './planner-view.js?v=20261017-topic2';
 import {view} from './reference-view.js?v=20261018-account1';
 import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261014-planner2';
 import {platforms,plannerState,newTopic,importLegacy,saveTopic,moscowDate,addDays,validDate} from './planner-model.js?v=20261014-planner2';
-import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261018-account1';
-import {handleCloudAction} from './cloud-ui.js?v=20261018-account1';
+import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
+import {handleCloudAction} from './cloud-ui.js?v=20261019-public1';
 import {ensureMilenaProject} from './milena-project.js?v=20261015-v2';
 import {readProjectPackage,mergeProjectPackage} from './project-package.js?v=20261018-import1';
 import {projectPhotoManager,topicMediaManager,fileRecords} from './media-manager.js?v=20261015-v2';
@@ -80,7 +80,7 @@ function stopGeneration(){aiRun++;aiAbort?.abort();u.aiLoading=false;}
 function startQuick(kind,day=''){guard(()=>{if(!u.orgId){entity('orgs');return;}if(!u.projId){entity('projects');return;}document.querySelectorAll('.create-menu[open]').forEach(x=>x.open=false);quickCreate(state,u,kind,day,async(next,type)=>{u.channel='';await commit(next,type==='topic'?'Тема добавлена':type==='shoot'?'Съёмка добавлена':'Публикация добавлена');});});}
 function download(){const blob=new Blob([JSON.stringify({version:2,exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='studio-content-plan-'+moscowDate()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('Экспорт включает старые записи и новый план');}
 document.addEventListener('click',async event=>{const dateCell=event.target.closest('[data-calendar-date]');if(dateCell&&!event.target.closest('button,a,input,select,textarea,summary,details')){dayActions(dateCell.dataset.calendarDate);return;}if(event.target.closest('.table-detail')&&!event.target.closest('button[data-action]'))return;const btn=event.target.closest('[data-action]');if(!btn||!state)return;const {action,id,tab}=btn.dataset;try{if(busy){toast('Дождитесь сохранения');return;}
- if(action.startsWith('cloud-')){await handleCloudAction(action,cloudAdapter);return;}
+ if(action.startsWith('cloud-')){await handleCloudAction(action,cloudAdapter,btn.dataset);return;}
  if(action==='site-menu'||action==='site-menu-close'){const shell=$('.reference-shell'),open=action==='site-menu'&&!shell.classList.contains('mobile-nav-open');shell.classList.toggle('mobile-nav-open',open);$('[data-action=site-menu]')?.setAttribute('aria-expanded',String(open));}
  else if(action==='shoot-open')guard(()=>{u.draft=null;u.view='shooting';u.shootTopic=btn.dataset.topic||'';u.shootDate='';u.shootFilter='all';u.shootSelected='';u.shootDetail=false;u.shootNoteDraft=null;render();scrollTo(0,0)});
  else if(action==='shoot-back')guard(()=>{u.view='overview';u.shootNoteDraft=null;render()});

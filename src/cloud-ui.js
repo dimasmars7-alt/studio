@@ -1,5 +1,5 @@
 import {escape as e,field,openDialog,toast,button as b} from './ui.js?v=20261012-cloud1';
-import {cloudStatus,cloudSignIn,cloudSignUp,cloudSignOut,cloudSaveProfile,pushCloudState,restoreCloudState} from './cloud-sync.js?v=20261018-account1';
+import {cloudStatus,cloudSignIn,cloudSignUp,cloudSignOut,cloudSaveProfile,pushCloudState,restoreCloudState,cloudPublishCatalog,cloudUnpublishCatalog} from './cloud-sync.js?v=20261019-public1';
 
 const roleNames={owner:'Владелец',photographer:'Фотограф',director:'Директор',observer:'Наблюдатель'};
 function formatTime(value){return value?new Date(value).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'ещё не выполнялась'}
@@ -17,7 +17,7 @@ export function cloudAccountDashboard(state){
   const localId=Object.keys(map).find(id=>map[id]===row.organization_id)||row.organization_id;
   const name=row.organizations?.name||state.orgs.find(org=>org.id===localId)?.name||'Организация';
   const count=localProjects.filter(project=>project.orgId===localId).length;
-  return '<li><strong>'+e(name)+'</strong><span>'+count+' '+(count===1?'проект на устройстве':'проектов на устройстве')+' · '+e(roleNames[row.role]||row.role||'Участник')+'</span></li>';
+  return '<li><strong>'+e(name)+'</strong><span>'+count+' '+(count===1?'проект на устройстве':'проектов на устройстве')+' · '+e(roleNames[row.role]||row.role||'Участник')+'</span>'+(row.role==='owner'?'<div class="account-share-actions">'+b('cloud-publish','Публичная ссылка','data-id="'+e(row.organization_id)+'"')+b('cloud-unpublish','Отключить ссылку','data-id="'+e(row.organization_id)+'"')+'</div>':'')+'</li>';
  }).join('');
  const displayName=s.profile?.display_name||s.user?.user_metadata?.display_name||'';
  return '<section class="card account-cloud-card"><div class="card-header"><h2>Личный кабинет</h2>'+cloudIndicator()+'</div><div class="account-identity"><span class="account-avatar">'+e((displayName||s.user?.email||'Д').slice(0,1).toUpperCase())+'</span><div><strong>'+e(displayName||'Укажите имя')+'</strong><span>'+e(s.user?.email||'')+'</span></div>'+b('cloud-profile-edit','Изменить имя')+'</div><h3>Мои организации и проекты</h3>'+(groups?'<ul class="account-organizations">'+groups+'</ul>':'<p class="subtitle">Облачных организаций пока нет. Перенесите локальные проекты в этот аккаунт.</p>')+'<p class="subtitle">Всего на этом устройстве: '+localCount+' проектов. После переноса их смогут видеть только участники организаций с доступом.</p><div class="account-cloud-actions">'+b('cloud-transfer','Перенести проекты в облако','','primary')+b('cloud-restore','Восстановить из облака')+b('cloud-sync','Синхронизировать')+b('cloud-signout','Выйти')+'</div>'+(s.message?'<p class="cloud-message '+e(s.phase)+'">'+e(s.message)+'</p>':'')+'</section>';
@@ -26,10 +26,20 @@ export function cloudAccountDashboard(state){
 export function openCloudDialog(render,mode='signin',profile={}){const s=cloudStatus();if(!s.configured){openDialog('Облачное хранение','<p>Подключение Supabase ещё не настроено.</p>',null);return}if(s.signedIn){openDialog('Облачное хранение',signedInBody(),null,true);return}const signup=mode==='signup';openDialog(signup?'Создать личный кабинет':'Вход в личный кабинет',(signup?field('displayName','Имя и фамилия',profile.name==='Тарусов'?'':profile.name||'','text',null,true):'')+field('email','Email',profile.email||'','email',null,true)+field('password','Пароль','','password',null,true)+'<p class="small-note">'+(signup?'Пароль задаёте только вы. После регистрации может понадобиться подтверждение email.':'После входа откройте кабинет и перенесите или восстановите проекты.')+'</p>',async data=>{if(String(data.password||'').length<8)throw Error('Пароль должен содержать не менее 8 символов');if(signup&&String(data.displayName||'').trim().length<2)throw Error('Укажите имя и фамилию');const result=signup?await cloudSignUp(data.email,data.password,data.displayName):await cloudSignIn(data.email,data.password);render();toast(result?.confirmationRequired?'Проверьте письмо и подтвердите email':'Облако подключено')});document.querySelector('#modal button[type=submit]').textContent=signup?'Создать аккаунт':'Войти'}
 
 function confirmCloud(title,body,label,action){openDialog(title,'<p>'+e(body)+'</p>',action);document.querySelector('#modal button[type=submit]').textContent=label}
-export async function handleCloudAction(action,adapter){
+export async function handleCloudAction(action,adapter,data={}){
  if(['cloud-open','cloud-register','cloud-login'].includes(action)){openCloudDialog(adapter.render,action==='cloud-register'?'signup':'signin',adapter.getState().profile);return true}
  if(action==='cloud-profile-edit'){const current=cloudStatus();openDialog('Имя в личном кабинете',field('displayName','Имя и фамилия',current.profile?.display_name||current.user?.user_metadata?.display_name||'','text',null,true),async data=>{await cloudSaveProfile(data.displayName);adapter.render();toast('Имя сохранено')});return true}
  if(action==='cloud-signout'){await cloudSignOut();document.querySelector('#modal')?.close();adapter.render();toast('Вы вышли из облака');return true}
+ if(action==='cloud-publish'){
+  confirmCloud('Публичная ссылка','Любой, у кого есть ссылка, увидит названия и описания проектов организации, а также названия тем. Сценарии, заметки, работы и файлы останутся закрытыми. Сначала перенесите актуальные проекты в облако.','Создать ссылку',async()=>{
+   const url=await cloudPublishCatalog(data.id);
+   adapter.render();
+   setTimeout(()=>{openDialog('Ссылка для просмотра','<p>Отправьте эту ссылку тем, кому нужно посмотреть проекты и темы без входа:</p>'+field('publicUrl','Публичная ссылка',url,'text')+'<button type="button" id="copy-public-url">Копировать ссылку</button><p class="small-note">Изменения появятся после синхронизации. Ссылку можно отключить в личном кабинете.</p>',null);const input=document.querySelector('#modal [name=publicUrl]');if(input)input.readOnly=true;document.querySelector('#copy-public-url')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(url);toast('Ссылка скопирована')}catch{input?.select();toast('Выделите ссылку и скопируйте её')}});},0);
+  });return true;
+ }
+ if(action==='cloud-unpublish'){
+  confirmCloud('Отключить публичную ссылку','Просмотр проектов и тем по ранее выданной ссылке прекратится. Данные в облаке останутся сохранены.','Отключить',async()=>{await cloudUnpublishCatalog(data.id);adapter.render();toast('Публичная ссылка отключена')});return true;
+ }
  if(action==='cloud-transfer'){confirmCloud('Перенести данные в облако','Организации, проекты, контент-план и вложения будут скопированы в защищённое облако. Локальная копия сохранится.','Перенести',async()=>{const next=await pushCloudState(adapter.getState());await adapter.applyState(next);toast('Данные перенесены в облако')});return true}
  if(action==='cloud-sync'){document.querySelector('#modal')?.close();const next=await pushCloudState(adapter.getState());await adapter.applyState(next);toast('Синхронизация завершена');return true}
  if(action==='cloud-restore'){confirmCloud('Восстановить из облака','Облачные версии организаций заменят их локальные копии. Остальные локальные организации сохранятся. Перед восстановлением рекомендуется экспортировать JSON-копию.','Восстановить',async()=>{const next=await restoreCloudState(adapter.getState());await adapter.applyState(next);toast('Данные восстановлены из облака')});return true}
