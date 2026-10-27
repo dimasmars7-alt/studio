@@ -2,6 +2,7 @@ import {cloudConfigured} from './cloud-config.js';
 import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js';
 import {organizationSnapshot,mergeOrganizationSnapshot} from './cloud-state.js';
 import {normalize} from './model.js?v=20261012-cloud1';
+import {getStorageStatus,markSyncing,markCloudSaved,markSyncError} from './storage-status.js';
 
 const mapKey='tarusov-planner-cloud-organizations';
 const versionKey='tarusov-planner-cloud-versions';
@@ -18,7 +19,7 @@ function rememberOrganization(localId,cloudId){const map=readObject(mapKey);map[
 function filePath(cloudId,file){const clean=String(file.name||'file').replace(/[\\/\u0000-\u001f]/g,'_').slice(-160);return [cloudId,file.projId,file.id,clean].join('/')}
 function dataBlob(value,type){const match=String(value||'').match(/^data:([^;,]+)(?:;[^;,]+)*;base64,(.*)$/s);if(!match)throw Error('Файл не удалось подготовить для облака');const raw=atob(match[2]),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:type||match[1]||'application/octet-stream'})}
 
-export function cloudStatus(){const auth=authState();return {...auth,...runtime,configured:cloudConfigured(),mappedCount:Object.keys(readObject(mapKey)).length}}
+export function cloudStatus(){const auth=authState();return {...auth,...runtime,storage:getStorageStatus(),configured:cloudConfigured(),mappedCount:Object.keys(readObject(mapKey)).length}}
 async function loadAccount(){runtime.members=await listOrganizations();try{runtime.profile=await getProfile()}catch{runtime.profile=null}}
 export async function cloudInitialize(){if(!cloudConfigured())return cloudStatus();if(authState().signedIn){try{await refreshSession();await loadAccount()}catch(error){update({phase:'error',message:error.message})}}return cloudStatus()}
 export async function cloudSignIn(email,password){update({phase:'working',message:'Входим…'});try{const result=await signIn(email,password);await loadAccount();update({phase:'ready',message:runtime.profile?'Вход выполнен':'Вход выполнен. Профиль Supabase пока недоступен'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
@@ -61,6 +62,7 @@ export async function pushCloudState(input){
  if(!authState().signedIn)throw Error('Сначала войдите в облако');
  if(!input.orgs.length)throw Error('Сначала добавьте организацию');
  update({phase:'working',message:'Сохраняем данные в облако…'});
+ markSyncing();
  const next=structuredClone(input),versions=readObject(versionKey);
  try{
   for(const org of next.orgs){
@@ -71,8 +73,8 @@ export async function pushCloudState(input){
    const saved=savedRow(await saveSnapshot(cloudId,envelope,remote?Number(known):0));
    versions[cloudId]=Number(saved?.version||remote?.version||1);rememberOrganization(org.id,cloudId);
   }
-  writeObject(versionKey,versions);runtime.members=await listOrganizations();const lastSync=new Date().toISOString();update({phase:'ready',message:'Данные синхронизированы',lastSync});return normalize(next);
- }catch(error){update({phase:'error',message:error.code==='40001'?'Конфликт версий: сначала восстановите свежие данные из облака':error.message});throw error}
+  writeObject(versionKey,versions);runtime.members=await listOrganizations();const lastSync=new Date().toISOString();update({phase:'ready',message:'Данные синхронизированы',lastSync});markCloudSaved();return normalize(next);
+ }catch(error){const conflict=error.code==='40001';update({phase:'error',message:conflict?'Конфликт версий: сначала восстановите свежие данные из облака':error.message});markSyncError(error,conflict);throw error}
 }
 
 export async function restoreCloudState(input){
@@ -86,8 +88,8 @@ export async function restoreCloudState(input){
    versions[cloudId]=Number(remote.version||1);restored++;
   }
   if(!restored)throw Error('В облаке пока нет сохранённых данных');
-  writeObject(mapKey,map);writeObject(versionKey,versions);runtime.members=rows;const lastSync=new Date().toISOString();update({phase:'ready',message:'Данные восстановлены из облака',lastSync});return normalize(next);
- }catch(error){update({phase:'error',message:error.message});throw error}
+  writeObject(mapKey,map);writeObject(versionKey,versions);runtime.members=rows;const lastSync=new Date().toISOString();update({phase:'ready',message:'Данные восстановлены из облака',lastSync});markCloudSaved();return normalize(next);
+ }catch(error){update({phase:'error',message:error.message});markSyncError(error,error.code==='40001');throw error}
 }
 
 export function queueCloudSync(state,onUpdated){
