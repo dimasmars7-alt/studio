@@ -7,7 +7,8 @@ import {seconds,retimeScenes} from './scene-timing.js?v=20261014-planner2';
 import {monthShift} from './content-calendar.js?v=20261014-planner2';
 import {newShot,shotFields,shotStatus,shotStatuses} from './storyboard.js?v=20261014-planner2';
 import {quickCreate} from './quick-create.js?v=20261016-v3';
-import {openStore,persist} from './storage.js?v=20261014-planner2';
+import {openStore,persist,backupState} from './storage.js?v=20261014-planner2';
+import {markLocalSaved} from './storage-status.js';
 import {uid,normalize,removeEntity} from './model.js?v=20261014-planner2';
 import {escape as e,field,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261014-planner2';
 import {editor} from './planner-view.js?v=20261017-topic2';
@@ -28,7 +29,7 @@ function renderEditor(){const openShots=[...document.querySelectorAll('.shot-det
 window.addEventListener('resize',fitEditor);
 function remember(){try{localStorage.setItem('studio-planner-context',JSON.stringify({orgId:u.orgId,projId:u.projId,archive:u.archive,navScope:u.navScope,folderId:u.folderId,view:u.view,scenarioView:u.scenarioView,calendarMode:u.calendarMode,calendarDate:u.calendarDate}))}catch{}}
 function selectInitial(){u.navScope='projects';if(!['week','month','half','day'].includes(u.calendarMode))u.calendarMode='week';if(!validDate(u.calendarDate)||!u.calendarDate)u.calendarDate=moscowDate();const org=state.orgs.find(x=>x.id===u.orgId)||state.orgs.find(x=>x.name.trim().toLowerCase()==='бодрый боцман')||state.orgs[0];u.orgId=org?.id||'';const project=state.projects.find(x=>x.id===u.projId&&x.orgId===u.orgId&&Boolean(x.archived)===u.archive)||state.projects.find(x=>x.orgId===u.orgId&&Boolean(x.archived)===u.archive);u.projId=project?.id||'';if(!['projects','organizations'].includes(u.navScope))u.navScope='projects';if(u.folderId&&!scopeFolders(state,u).some(f=>f.id===u.folderId))u.folderId='';}
-async function commit(next,message='Сохранено'){if(busy)throw Error('Дождитесь сохранения');busy=true;document.querySelectorAll('[data-action=shoot-status],[data-action=shoot-note-save]').forEach(x=>x.disabled=true);try{await persist(next);state=next;render();queueCloudSync(state,applyCloudMetadata);toast(message)}finally{busy=false}}
+async function commit(next,message='Сохранено'){if(busy)throw Error('Дождитесь сохранения');busy=true;document.querySelectorAll('[data-action=shoot-status],[data-action=shoot-note-save]').forEach(x=>x.disabled=true);try{await backupState(state,'Перед изменением данных');await persist(next);markLocalSaved();state=next;render();queueCloudSync(state,applyCloudMetadata);toast(message)}finally{busy=false}}
 async function applyCloudMetadata(synced){if(!state)return;const next=structuredClone(state),paths=new Map(synced.files.filter(x=>x.storagePath).map(x=>[x.id,x.storagePath]));next.files.forEach(file=>{if(paths.has(file.id))file.storagePath=paths.get(file.id)});await persist(next);state=next;render()}
 async function applyCloudState(next){await persist(next);state=next;selectInitial();render()}
 const cloudAdapter={getState:()=>state,applyState:applyCloudState,render:()=>state&&render()};
@@ -239,7 +240,7 @@ document.addEventListener('keydown',event=>{if(event.key!=='Tab'||!u.draft||inne
 window.addEventListener('beforeunload',event=>{if(u.dirty||u.tableDate||u.shootNoteDirty){event.preventDefault();event.returnValue='';}});
 document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(a&&(u.dirty||u.shootNoteDirty)){event.preventDefault();guard(()=>{location.href=a.href})}});
 (async()=>{try{const result=await openStore(),migrated=importLegacy(result.state),milena=ensureMilenaProject(migrated.state);state=milena.state;if(migrated.changed||milena.changed)await persist(state);try{Object.assign(u,JSON.parse(localStorage.getItem('studio-planner-context')||'{}'));}catch{}if(milena.changed){u.orgId=milena.orgId;u.projId=milena.projectId;}selectInitial();render();cloudInitialize().then(()=>render()).catch(()=>render());const topicId=new URLSearchParams(location.search).get('topic');if(topicId){const topic=plannerState(state).topics.find(t=>t.id===topicId);if(topic){u.orgId=state.projects.find(p=>p.id===topic.projId)?.orgId||u.orgId;openTopic(topicId,'scenes');}}}catch(err){$('#planner').innerHTML='<section class="empty-panel"><h1>Не удалось открыть план</h1><p>'+e(err.message)+'</p><a href="./index.html#home">Вернуться на главную</a></section>';}})();
-addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());
+addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());addEventListener('planner-storage-status',()=>state&&render());
 
 document.addEventListener('keydown',event=>{const node=event.target.closest('[role=tab][data-action=editor-tab]');if(!node||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=[...node.closest('[role=tablist]').querySelectorAll('[role=tab]')],i=tabs.indexOf(node),target=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[target].click();});
 
