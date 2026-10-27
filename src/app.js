@@ -1,6 +1,7 @@
 import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261012-cloud1';
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
-import {openStore,persist} from './storage.js?v=20261012-cloud1';
+import {openStore,persist,backupState} from './storage.js?v=20261012-cloud1';
+import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261012-cloud1';
 import * as views from './views.js?v=20261018-account1';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
@@ -23,7 +24,7 @@ function render(){
 }
 async function commit(next,message='Сохранено'){
  if(busy)throw Error('Дождитесь сохранения текущего изменения');
- busy=true;try{await persist(next);state=next;render();queueCloudSync(state,applyCloudMetadata);if(message)toast(message)}finally{busy=false}
+ busy=true;try{await backupState(state,'Перед изменением данных');await persist(next);markLocalSaved();state=next;render();queueCloudSync(state,applyCloudMetadata);if(message)toast(message)}finally{busy=false}
 }
 async function applyCloudMetadata(synced){if(!state)return;const next=structuredClone(state),paths=new Map(synced.files.filter(x=>x.storagePath).map(x=>[x.id,x.storagePath]));next.files.forEach(file=>{if(paths.has(file.id))file.storagePath=paths.get(file.id)});await persist(next);state=next;render()}
 async function applyCloudState(next){await persist(next);state=next;if(!state.orgs.some(x=>x.id===ui.orgId)){ui.orgId=state.orgs[0]?.id||'';ui.projId=state.projects.find(x=>x.orgId===ui.orgId&&!x.archived)?.id||''}render()}
@@ -206,6 +207,6 @@ async function init(){
  }catch(err){$('#app').innerHTML='<div class="boot"><h1>Не удалось открыть хранилище</h1><p>'+e(err.message)+'</p><p>Откройте приложение через локальный сервер в обычном окне браузера.</p><button onclick="location.reload()">Повторить</button></div>'}
 }
 init();
-addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());
+addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());addEventListener('planner-storage-status',()=>state&&render());
 
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#modal').open){$('#sidebar')?.classList.remove('open');$('[data-action=menu]')?.setAttribute('aria-expanded','false');}});
