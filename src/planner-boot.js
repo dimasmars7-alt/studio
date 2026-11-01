@@ -1,5 +1,5 @@
 const container=document.querySelector('#planner');
-function showFailure(error){if(!container.querySelector('.loading'))return;console.error('Не удалось запустить контент-план:',error);container.replaceChildren();const panel=document.createElement('section');panel.className='empty-panel';const title=document.createElement('h1');title.textContent='Не удалось загрузить контент-план';const note=document.createElement('p');note.textContent='Повторите загрузку. Сохранённые материалы остаются на этом устройстве.';const button=document.createElement('button');button.type='button';button.className='primary';button.textContent='Повторить загрузку';button.onclick=()=>location.reload();panel.append(title,note,button);container.append(panel);}
+function showFailure(error){if(!container.querySelector('.loading'))return;console.error('Не удалось запустить контент-план:',error);container.replaceChildren();const panel=document.createElement('section');panel.className='empty-panel';const title=document.createElement('h1');title.textContent='Не удалось загрузить контент-план';const note=document.createElement('p');note.textContent='Повторите загрузку. Сохранённые материалы остаются на этом устройстве.';const details=document.createElement('p');details.className='small-note';const message=error instanceof Error?error.message:String(error||'Неизвестная ошибка');details.textContent='Причина: '+message;const button=document.createElement('button');button.type='button';button.className='primary';button.textContent='Повторить загрузку';button.onclick=()=>location.reload();panel.append(title,note,details,button);container.append(panel);}
 if(location.protocol==='file:'){
  container.replaceChildren();
  const panel=document.createElement('section');panel.className='empty-panel';
@@ -10,6 +10,6 @@ if(location.protocol==='file:'){
  panel.append(title,note,link,local);container.append(panel);
 }else{
  window.addEventListener('error',event=>showFailure(event.error||event.message));window.addEventListener('unhandledrejection',event=>showFailure(event.reason));
- import('./planner-app.js?v=20261019-public1').catch(showFailure);
+ import('./planner-app.js?v=20261101-debug1').catch(showFailure);
 }
 
