@@ -39,6 +39,7 @@ assert.equal(restored.files[0].storagePath,pushed.files[0].storagePath);
 
 localStorage.removeItem('tarusov-planner-cloud-versions');
 await assert.rejects(()=>cloud.pushCloudState(state),/Сначала восстановите/);
+assert.equal(cloud.cloudStatus().storage.phase,'error');
 
 const apiRequest=requests.find(item=>item.url.includes('/rest/v1/'));
 assert.equal(apiRequest.options.headers.apikey,'sb_publishable_sYKY8BtYUk3ewdygDiMhRQ__bATXT08');

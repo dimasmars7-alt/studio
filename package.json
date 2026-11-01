@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "preview": "node tools/preview-server.mjs",
-    "test": "node tests/cloud-sync.test.mjs && node tests/cloud-account.test.mjs && node tests/public-catalog.test.mjs && node tests/project-overview.test.mjs && node tests/milena-project.test.mjs && node tests/topic-wizard.test.mjs && node tests/topic-editor-v2.test.mjs",
+    "test": "node tests/cloud-sync.test.mjs && node tests/cloud-account.test.mjs && node tests/public-catalog.test.mjs && node tests/project-overview.test.mjs && node tests/milena-project.test.mjs && node tests/topic-wizard.test.mjs && node tests/topic-editor-v2.test.mjs && node tests/storage-status.test.mjs",
     "check": "node tests/check-js.mjs"
   }
 }
