@@ -1,5 +1,6 @@
 import {cloudConfigured} from './cloud-config.js';
-import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js?v=20261101-cloudfix';
+import * as cloudClient from './cloud-client.js?v=20261101-cloudfix';
+import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js?v=20261101-cloudfix';
 import {organizationSnapshot,mergeOrganizationSnapshot} from './cloud-state.js';
 import {normalize} from './model.js?v=20261012-cloud1';
 import {getStorageStatus,markSyncing,markCloudSaved,markSyncError} from './storage-status.js';
@@ -20,7 +21,7 @@ function filePath(cloudId,file){const clean=String(file.name||'file').replace(/[
 function dataBlob(value,type){const match=String(value||'').match(/^data:([^;,]+)(?:;[^;,]+)*;base64,(.*)$/s);if(!match)throw Error('Файл не удалось подготовить для облака');const raw=atob(match[2]),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:type||match[1]||'application/octet-stream'})}
 
 export function cloudStatus(){const auth=authState();return {...auth,...runtime,storage:getStorageStatus(),configured:cloudConfigured(),mappedCount:Object.keys(readObject(mapKey)).length}}
-async function loadAccount(){runtime.members=await listOrganizations();try{runtime.profile=await getProfile()}catch{runtime.profile=null}}
+async function loadAccount(){runtime.members=await listOrganizations();try{runtime.profile=typeof cloudClient.getProfile==='function'?await cloudClient.getProfile():null}catch{runtime.profile=null}}
 export async function cloudInitialize(){if(!cloudConfigured())return cloudStatus();if(authState().signedIn){try{await refreshSession();await loadAccount()}catch(error){update({phase:'error',message:error.message})}}return cloudStatus()}
 export async function cloudSignIn(email,password){update({phase:'working',message:'Входим…'});try{const result=await signIn(email,password);await loadAccount();update({phase:'ready',message:runtime.profile?'Вход выполнен':'Вход выполнен. Профиль Supabase пока недоступен'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
 export async function cloudSignUp(email,password,displayName=''){update({phase:'working',message:'Создаём аккаунт…'});try{const result=await signUp(email,password,displayName);if(result.state.signedIn)await loadAccount();update({phase:result.confirmationRequired?'notice':'ready',message:result.confirmationRequired?'Подтвердите адрес по письму Supabase':'Аккаунт создан'});return result}catch(error){update({phase:'error',message:error.message});throw error}}
