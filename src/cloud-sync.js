@@ -1,5 +1,5 @@
 import {cloudConfigured} from './cloud-config.js';
-import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js';
+import {authState,signIn,signUp,signOut,refreshSession,listOrganizations,claimOrganization,loadSnapshot,saveSnapshot,uploadMedia,createSignedMediaUrl,getProfile,updateProfile,publishOrganizationCatalog,unpublishOrganizationCatalog} from './cloud-client.js?v=20261101-cloudfix';
 import {organizationSnapshot,mergeOrganizationSnapshot} from './cloud-state.js';
 import {normalize} from './model.js?v=20261012-cloud1';
 import {getStorageStatus,markSyncing,markCloudSaved,markSyncError} from './storage-status.js';
