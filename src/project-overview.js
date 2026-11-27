@@ -78,7 +78,8 @@ function overviewSide(s,u,topics,data){const critical=topics.flatMap(t=>t.scenes
 function projectStatus(topics){
  const hasTopics=topics.length>0, scenes=topics.flatMap(t=>t.scenes||[]), variants=topics.flatMap(t=>t.variants||[]), shot=scenes.length>0&&scenes.every(x=>shotStatus(x)==='Снято'), published=variants.length>0&&variants.every(x=>x.ready==='Опубликовано');
  const active=published?3:shot?2:hasTopics?1:0, labels=['Идея','Подготовка','Съёмка','Публикация'], icons=['✦','◌','▣','↗'];
- return '<section class="project-status-strip" aria-label="Статус проекта"><div class="status-title"><strong>Статус проекта</strong><small>'+(['Начните с первой темы','Подготовьте тему и кадры','Съёмка в работе','Проект опубликован'][active])+'</small></div><div class="status-steps">'+labels.map((label,i)=>'<div class="status-step '+(i<active?'done ':'')+(i===active?'active':'')+'"><i>'+icons[i]+'</i><span>'+label+'</span></div>').join('<b class="status-line '+(i<active?'done':'')+'"></b>')+'</div><span class="status-count">Этап '+(active+1)+' из 4</span></section>';
+ const steps=labels.map((label,i)=>(i?'<b class="status-line '+(i-1<active?'done':'')+'"></b>':'')+'<div class="status-step '+(i<active?'done ':'')+(i===active?'active':'')+'"><i>'+icons[i]+'</i><span>'+label+'</span></div>').join('');
+ return '<section class="project-status-strip" aria-label="Статус проекта"><div class="status-title"><strong>Статус проекта</strong><small>'+(['Начните с первой темы','Подготовьте тему и кадры','Съёмка в работе','Проект опубликован'][active])+'</small></div><div class="status-steps">'+steps+'</div><span class="status-count">Этап '+(active+1)+' из 4</span></section>';
 }
 
 export function projectOverview(s,u,topics,tableHtml){
