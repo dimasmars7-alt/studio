@@ -1,6 +1,6 @@
 import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261012-cloud1';
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
-import {openStore,persist,backupState} from './storage.js?v=20261012-cloud1';
+import {openStore,persist,backupState} from './storage.js?v=20261127-brand22';
 import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261012-cloud1';
 import * as views from './views.js?v=20261018-account1';
