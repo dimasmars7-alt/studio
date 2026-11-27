@@ -49,10 +49,10 @@ function entityForm(type,id=null,date=null){
  if(['posts','links'].includes(type)&&!state.projects.some(x=>x.id===ui.projId))throw Error('Сначала выберите проект');
  const x=existing||{},f=(name,label,value='',kind='text',options=null,required=false)=>field(name,label,x[name]??value,kind,options,required);
  let html='';
- if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+timeField('time','Время',x.time||'')+'</div>'+projectPicker(x.projId||'')+f('place','Место')+f('desc','Описание','','textarea');
+ if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+timeField('time','Время',x.time||'')+'</div>'+projectPicker(x.projId||ui.projId)+f('place','Место')+f('desc','Описание','','textarea');
  else if(['orgs','projects'].includes(type))html=f('name','Название','','text',null,true)+f('emoji','Эмодзи','📁')+(type==='projects'?f('color','Цвет проекта',nextProjectColor(state.projects),'color'):'');
  else if(type==='posts')html=publicationForm(state,ui,x,platforms(state),date);
- else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']])+f('date','Срок',date||'','date')+timeField('time','Время',x.time||'')+'</div>';
+ else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('date','Дата задачи',date||'','date',null,true)+timeField('time','Время',x.time||'')+'</div>'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']]);
  else if(type==='gear')html=f('name','Название','','text',null,true)+f('catId','Категория','','text',choices('gearCats'))+'<div class="form-grid">'+f('qty','Количество',1,'number',null,true)+f('price','Цена за единицу, ₽',0,'number',null,true)+'</div>';
  else if(type==='portfolio')html=f('name','Название работы','','text',null,true)+f('catId','Категория','','text',choices('portCats'))+f('link','Ссылка на работу','','url');
  else if(type==='links')html=f('name','Название','','text',null,true)+f('url','URL','','url',null,true);
@@ -61,6 +61,8 @@ function entityForm(type,id=null,date=null){
  openDialog(type==='posts'?(id?'Карточка публикации':'Новая публикация'):(id?'Изменить: ':'Добавить: ')+titles[type],html,async data=>{
  for(const key of Object.keys(data))if(typeof data[key]==='string'&&!(type==='posts'&&key==='text'))data[key]=data[key].trim();
  for(const key of ['url','link'])if(data[key]&&!safeUrl(data[key]))throw Error('Используйте ссылку с http:// или https://');
+ if(['shoots','posts','tasks'].includes(type)&&(!data.date||!validDate(data.date)))throw Error('Выберите корректную дату');
+ if(type==='shoots'&&(!data.projId||!state.projects.some(x=>x.id===data.projId)))throw Error('Выберите проект');
  for(const key of ['title','name','text','desc'])if(key in data&&!data[key]&&['title','name'].includes(key))throw Error('Заполните название');
  if(type==='tasks'&&!data.text)throw Error('Введите текст задачи');
  if(type==='gear'){data.qty=Number(data.qty);data.price=Number(data.price);if(!Number.isInteger(data.qty)||data.qty<1||!Number.isFinite(data.price)||data.price<0)throw Error('Количество должно быть целым и положительным; цена — неотрицательной')}
