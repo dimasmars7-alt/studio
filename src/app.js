@@ -9,7 +9,7 @@ import {publicationForm,templates,moscowDate} from './planning.js?v=20261012-clo
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
 import {handleCloudAction} from './cloud-ui.js?v=20261019-public1';
 let state,busy=false;
-const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
+const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',calFilter:'all',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
 const $=s=>document.querySelector(s);
 const titles={shoots:'Съёмка',orgs:'Организация',projects:'Проект',posts:'Материал',tasks:'Задача',gear:'Снаряжение',portfolio:'Работа в портфолио',links:'Ссылка',finances:'Финансовая операция',rubrics:'Рубрика',socials:'Соцсеть',statuses:'Статус',gearCats:'Категория снаряжения',portCats:'Категория портфолио'};
 function applyAppearance(){
@@ -55,7 +55,7 @@ function entityForm(type,id=null,date=null){
  if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+timePicker(x.time||'')+'</div>'+projectPicker(x.projId||'')+f('place','Место')+f('desc','Описание','','textarea');
  else if(['orgs','projects'].includes(type))html=f('name','Название','','text',null,true)+f('emoji','Эмодзи','📁')+(type==='projects'?f('color','Цвет проекта',nextProjectColor(state.projects),'color'):'');
  else if(type==='posts')html=publicationForm(state,ui,x,platforms(state),date);
- else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']])+f('date','Срок','','date')+'</div>';
+ else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']])+f('date','Срок',date||'','date')+'</div>';
  else if(type==='gear')html=f('name','Название','','text',null,true)+f('catId','Категория','','text',choices('gearCats'))+'<div class="form-grid">'+f('qty','Количество',1,'number',null,true)+f('price','Цена за единицу, ₽',0,'number',null,true)+'</div>';
  else if(type==='portfolio')html=f('name','Название работы','','text',null,true)+f('catId','Категория','','text',choices('portCats'))+f('link','Ссылка на работу','','url');
  else if(type==='links')html=f('name','Название','','text',null,true)+f('url','URL','','url',null,true);
@@ -71,7 +71,7 @@ function entityForm(type,id=null,date=null){
  const record={...existing,...data,id:id||uid()};
  if(type==='projects'){if(!validColor(record.color))throw Error('Выберите цвет проекта');record.orgId=existing?.orgId||ui.orgId;record.archived=Boolean(existing?.archived)}
  if(['posts','links'].includes(type))record.projId=existing?.projId||ui.projId;
- if(type==='tasks')record.done=Boolean(existing?.done);
+ if(type==='tasks'){record.done=Boolean(existing?.done);record.projId=existing?.projId||ui.projId}
  const next=structuredClone(state);
  if(type==='posts'&&record.social?.startsWith('platform:')){const name=record.social.slice(9),social=platforms(state).find(v=>v.id===record.social);if(!social)throw Error('Площадка не найдена');const actual={id:uid(),name,color:'#7054d8'};next.socials.push(actual);if(ui.postSocial===record.social)ui.postSocial=actual.id;record.social=actual.id}
  if(id)next[type]=next[type].map(v=>v.id===id?record:v);else next[type].push(record);
@@ -155,7 +155,7 @@ document.addEventListener('click',async event=>{
  else if(action==='delete'){
  const text=['orgs','projects'].includes(type)?'Запись и все связанные проекты, посты, ссылки и файлы будут удалены. Продолжить?':'Удалить эту запись?';
  confirmDialog('Удаление',text,async()=>{await commit(removeEntity(state,type,id),'Запись удалена');if(type==='orgs'&&ui.orgId===id){ui.orgId='';ui.projId=''}if(type==='projects'&&ui.projId===id)ui.projId='';render()});
- }else if(action==='day'){ui.date=date;openDialog('Съёмки · '+date,views.shootList(generalShoots(state).filter(x=>x.date===date),state)+'<div style="margin-top:16px">'+b('add','＋ Съёмка','data-type="shoots" data-date="'+date+'"','primary')+'</div>',null,true)}
+ }else if(action==='day'){ui.date=date;openDialog('События · '+date,views.shootList(generalShoots(state).filter(x=>x.date===date),state)+'<div class="calendar-day-actions">'+b('add','＋ Съёмка','data-type="shoots" data-date="'+date+'"','primary')+b('add','＋ Публикация','data-type="posts" data-date="'+date+'"')+b('add','＋ Задача','data-type="tasks" data-date="'+date+'"')+'</div>',null,true)}
  else if(action==='calendar-date'){ui.date=date;ui.calMode='month';navigate('cal')}
  else if(action==='calendar-year'){ui.date=year+'-01-01';ui.calMode='year';render()}
  else if(action==='cal-prev'||action==='cal-next')shiftDate('date',action==='cal-prev'?-1:1,ui.calMode);
