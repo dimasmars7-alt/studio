@@ -29,13 +29,25 @@ document.addEventListener('click',event=>{
  if(label&&!event.target.closest('input,select,textarea,button')){const input=label.querySelector('input[type=date]');try{input?.showPicker?.()}catch{input?.focus()}}
 });
 export function toast(message){const t=document.querySelector('#toast');t.textContent=message;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),4200)}
+function askDiscard(){
+ const c=document.querySelector('#confirm-discard')||Object.assign(document.body.appendChild(document.createElement('dialog')),{id:'confirm-discard'});
+ c.innerHTML='<div class="confirm-discard-content"><span class="eyebrow">НЕСОХРАНЁННЫЕ ИЗМЕНЕНИЯ</span><h2>Закрыть без сохранения?</h2><p>Введённые данные будут отменены.</p><div class="confirm-discard-actions"><button type="button" data-discard-cancel>Остаться</button><button type="button" class="primary" data-discard-confirm>Закрыть без сохранения</button></div></div>';
+ return new Promise(resolve=>{
+  let settled=false;
+  const finish=value=>{if(settled)return;settled=true;c.close();resolve(value)};
+  c.querySelector('[data-discard-cancel]').onclick=()=>finish(false);
+  c.querySelector('[data-discard-confirm]').onclick=()=>finish(true);
+  c.oncancel=event=>{event.preventDefault();finish(false)};
+  c.showModal();
+ });
+}
 export function openDialog(title,body,onSubmit,wide=false){
  const d=document.querySelector('#modal');
  d.className=wide?'wide':'';
  d.innerHTML='<form method="dialog"><header><div><span class="eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО</span><h2>'+escape(title)+'</h2></div><button type="button" class="icon-btn" aria-label="Закрыть" id="close-dialog">×</button></header><div class="dialog-body">'+body+'</div>'+(onSubmit?'<footer><button type="button" id="cancel-dialog">Отмена</button><button class="primary" type="submit">Сохранить</button></footer>':'')+'</form>';
  const form=d.querySelector('form');
  let dirty=false;
- const closeDialog=()=>{if(dirty&&onSubmit&&!window.confirm('Закрыть без сохранения?'))return;dirty=false;d.close()};
+ const closeDialog=async()=>{if(dirty&&onSubmit&&!await askDiscard())return;dirty=false;if(d.open)d.close()};
  form.addEventListener('input',()=>{dirty=true});
  form.addEventListener('change',()=>{dirty=true});
  d.querySelector('#close-dialog').onclick=closeDialog;

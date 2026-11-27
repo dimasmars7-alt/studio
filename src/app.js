@@ -2,12 +2,13 @@ import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=2
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
-import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time2';
+import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time3';
 import * as views from './views.js?v=20261127-brand27';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
 import {handleCloudAction} from './cloud-ui.js?v=20261019-public1';
+import {removeMilenaDemo} from './milena-project.js?v=20261127-brand36';
 let state,busy=false;
 const ui={section:views.sections.some(x=>x[0]===location.hash.slice(1))?location.hash.slice(1):'home',date:dateKey(),postDate:moscowDate(),calMode:'month',calFilter:'all',orgId:'',projId:'',postTab:'cal',archive:false,taskFilter:'all',query:'',postStatus:'',portCat:'',postSocial:''};
 const $=s=>document.querySelector(s);
@@ -214,7 +215,7 @@ setInterval(refreshOverviewDate,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshOverviewDate()});
 async function init(){
  try{
- const result=await openStore();state=result.state;
+ const result=await openStore();const cleaned=removeMilenaDemo(result.state);state=cleaned.state;if(cleaned.changed)await persist(state);
  if(state.orgs.length){ui.orgId=state.orgs[0].id;ui.projId=state.projects.find(x=>x.orgId===ui.orgId&&!x.archived)?.id||''}
  render();if(result.migrated)toast('Данные предыдущей версии перенесены');cloudInitialize().then(()=>render()).catch(()=>render());
  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>toast('Офлайн-кеш недоступен. Приложение продолжает работать онлайн.'));
