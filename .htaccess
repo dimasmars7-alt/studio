@@ -36,4 +36,5 @@ Options -Indexes
 </IfModule>
 
 # Hash routing is used: SPA rewrite rules are not required.
+# Public deployment marker: 2026-11-27 planner release.
 
