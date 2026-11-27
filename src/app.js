@@ -37,6 +37,11 @@ function navigate(section){
  ui.section=section;ui.query='';location.hash=section;render();
 }
 const choices=(key)=>[['','Не выбрано'],...state[key].map(x=>[x.id,(x.emoji||'')+' '+x.name])];
+function projectPicker(value=''){
+ const projects=state.projects.filter(x=>!x.archived),selected=projects.find(x=>x.id===value),label=selected?.name||'Не выбран',meta=selected?(state.orgs.find(o=>o.id===selected.orgId)?.name||'Активный проект'):'Выберите проект';
+ const rows=projects.length?projects.map(p=>'<button type="button" class="project-picker-option" data-action="project-option" data-id="'+e(p.id)+'" data-project-option="'+e((p.name+' '+(state.orgs.find(o=>o.id===p.orgId)?.name||'')).toLowerCase())+'"><i style="background:'+(validColor(p.color)?p.color:'#c86f4a')+'"></i><span><strong>'+e(p.name)+'</strong><small>'+e(state.orgs.find(o=>o.id===p.orgId)?.name||'Активный проект')+'</small></span>'+(p.id===value?'<b aria-label="Выбран">✓</b>':'')+'</button>').join(''):'<p class="project-picker-empty">Активных проектов пока нет.</p>';
+ return '<div class="field project-picker-field"><span class="field-label">Проект</span><input type="hidden" name="projId" value="'+e(value)+'"><details class="project-picker"><summary><i style="background:'+(selected&&validColor(selected.color)?selected.color:'#c86f4a')+'"></i><span><strong>'+e(label)+'</strong><small>'+e(meta)+'</small></span></summary><div class="project-picker-menu"><input type="search" placeholder="Найти проект" aria-label="Найти проект" data-project-search>'+rows+'</div></details></div>';
+}
 function entityForm(type,id=null,date=null){
  const existing=id?state[type].find(x=>x.id===id):null;
  if(id&&!existing)throw Error('Запись не найдена');
@@ -44,7 +49,7 @@ function entityForm(type,id=null,date=null){
  if(['posts','links'].includes(type)&&!state.projects.some(x=>x.id===ui.projId))throw Error('Сначала выберите проект');
  const x=existing||{},f=(name,label,value='',kind='text',options=null,required=false)=>field(name,label,x[name]??value,kind,options,required);
  let html='';
- if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+f('time','Время','','time')+'</div>'+f('projId','Проект','','text',choices('projects'))+f('place','Место')+f('desc','Описание','','textarea');
+ if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+f('time','Время','','time')+'</div>'+projectPicker(x.projId||'')+f('place','Место')+f('desc','Описание','','textarea');
  else if(['orgs','projects'].includes(type))html=f('name','Название','','text',null,true)+f('emoji','Эмодзи','📁')+(type==='projects'?f('color','Цвет проекта',nextProjectColor(state.projects),'color'):'');
  else if(type==='posts')html=publicationForm(state,ui,x,platforms(state),date);
  else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']])+f('date','Срок','','date')+'</div>';
@@ -139,6 +144,7 @@ document.addEventListener('click',async event=>{
  else if(action==='planner-shoot')location.href='./planner.html?topic='+encodeURIComponent(id)+'&tab=scenes';
  else if(action==='add')entityForm(type,null,date);
  else if(action==='edit')entityForm(type,id);
+ else if(action==='project-option'){const picker=btn.closest('.project-picker');const project=state.projects.find(x=>x.id===id&&!x.archived);if(project&&picker){picker.closest('.project-picker-field').querySelector('[name=projId]').value=project.id;const org=state.orgs.find(x=>x.id===project.orgId);picker.querySelector('summary').innerHTML='<i style="background:'+(validColor(project.color)?project.color:'#c86f4a')+'"></i><span><strong>'+e(project.name)+'</strong><small>'+e(org?.name||'Активный проект')+'</small></span>';picker.removeAttribute('open');picker.querySelectorAll('.project-picker-option').forEach(x=>x.querySelector('b')?.remove());btn.insertAdjacentHTML('beforeend','<b aria-label="Выбран">✓</b>');}}
  else if(action==='script-template'){const text=templates[btn.dataset.template],input=btn.closest('form')?.querySelector('[name=text]');if(input&&text){input.value+=(input.value?'\n\n':'')+text;input.focus();toast('Шаблон добавлен в карточку. Нажмите «Сохранить», чтобы сохранить.')}}
  else if(action==='content-project'){ui.projId=id;render()}
  else if(action==='content-social'){ui.postSocial=btn.dataset.social;render()}
@@ -191,6 +197,7 @@ document.addEventListener('change',async event=>{
  }
  }catch(err){toast(err.message);render()}
 });
+document.addEventListener('input',event=>{const input=event.target;if(!input.matches('[data-project-search]'))return;const q=input.value.trim().toLowerCase();input.closest('.project-picker-menu')?.querySelectorAll('[data-project-option]').forEach(row=>{row.hidden=Boolean(q&&!row.dataset.projectOption.includes(q));});});
 let searchTimer;
 document.addEventListener('input',event=>{
  if(event.target.dataset.control!=='query')return;
