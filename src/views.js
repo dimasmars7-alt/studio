@@ -1,5 +1,5 @@
 import {icon,brand} from './icons.js?v=20261012-cloud1';
-import {generalShoots,projectColor,projectName} from './project-colors.js?v=20261012-cloud1';
+import {generalShoots,projectColor,projectName} from './project-colors.js?v=20261127-brand43';
 import {dateKey} from './model.js?v=20261012-cloud1';
 import {escape as e,money,pretty,button as b,empty,badge,link} from './ui.js?v=20261012-cloud1';
 import {cloudSettingsCard,cloudIndicator,cloudAccountDashboard} from './cloud-ui.js?v=20261018-account1';

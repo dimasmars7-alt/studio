@@ -19,7 +19,8 @@ function applyAppearance(){
  document.documentElement.dataset.logoSize=state.settings.logoSize||'large';
  document.documentElement.dataset.density=state.settings.density||'comfortable';
  document.documentElement.dataset.contrast=state.settings.contrast||'standard';
- for(const [key,value] of Object.entries({'--accent':state.settings.accent==='#28745b'?'#7561df':state.settings.accent,'--font':state.settings.fontSize+'px','--sidebar':state.settings.navWidth+'px'}))document.documentElement.style.setProperty(key,value);
+ const rawAccent=String(state.settings.accent||'').toLowerCase(),safeAccent=['#28745b','#7561df','#7054d8','#7055e8','#6237f4'].includes(rawAccent)?'#c86f4a':(rawAccent||'#c86f4a');
+ for(const [key,value] of Object.entries({'--accent':safeAccent,'--font':state.settings.fontSize+'px','--sidebar':state.settings.navWidth+'px'}))document.documentElement.style.setProperty(key,value);
 }
 function render(){
  applyAppearance();
