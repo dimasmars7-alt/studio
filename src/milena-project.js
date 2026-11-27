@@ -24,3 +24,16 @@ export function ensureMilenaProject(input){
  ].map((t,index)=>({id:uid(),projId:project.id,title:t.title,taskStatus:t.taskStatus,script:t.script||'',rubric:'',workIds:t.workIds,scenes:t.scenes||[],variants:t.variants||[],preparation:[],approval:'Не отправлено',answers:{},folderIds:[],order:index+1}));
  state.planner.topics.push(...topics);return {state,changed:true,orgId:org.id,projectId:project.id};
 }
+
+export function removeMilenaDemo(input){
+ const state=structuredClone(input),demo=state.projects.filter(p=>p.name?.trim().toLowerCase()==='милена 7950'&&p.description==='Тюнинг и восстановление катера. Прибыл 14 октября 2026 года.'&&p.version==='2.0');
+ if(!demo.length)return {state,changed:false};
+ const ids=new Set(demo.map(p=>p.id));
+ state.projects=state.projects.filter(p=>!ids.has(p.id));
+ state.tasks=(state.tasks||[]).filter(x=>!ids.has(x.projId));
+ state.shoots=(state.shoots||[]).filter(x=>!ids.has(x.projId));
+ state.posts=(state.posts||[]).filter(x=>!ids.has(x.projId));
+ state.planner.works=state.planner.works.filter(x=>!ids.has(x.projId));
+ state.planner.topics=state.planner.topics.filter(x=>!ids.has(x.projId));
+ return {state,changed:true};
+}
