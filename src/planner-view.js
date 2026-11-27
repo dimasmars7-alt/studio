@@ -1,5 +1,5 @@
 import {questionView} from './qa-scenario.js?v=20261012-cloud1';
-import {topicEditorV2} from './topic-editor-v2.js?v=20261017-topic2';
+import {topicEditorV2} from './topic-editor-v2.js?v=20261127-time2';
 import {escape as e,button as b,badge} from './ui.js?v=20261012-cloud1';
 import {plannerState,weekEvents,addDays} from './planner-model.js?v=20261012-cloud1';
 const select=(name,label,value,rows,extra='')=>'<label class="field">'+label+'<select '+extra+' name="'+name+'">'+rows.map(([v,t])=>'<option value="'+e(v)+'" '+(v===value?'selected':'')+'>'+e(t)+'</option>').join('')+'</select></label>';
