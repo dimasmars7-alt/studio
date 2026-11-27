@@ -15,6 +15,11 @@ export function field(name,label,value='',type='text',options=null,required=fals
  else input='<input '+attrs+' type="'+type+'" value="'+escape(value)+'" '+(type==='number'?'min="0" step="any"':'')+'>';
  return '<label class="field">'+escape(label)+input+'</label>'+(name==='emoji'?'<div class="toolbar" aria-label="Быстрый выбор эмодзи">'+['📷','📁','🎬','📰','🏷️','💒','✨','🎒','🎨','💼','🌿','⭐'].map(icon=>button('emoji',icon,'data-emoji="'+icon+'" aria-label="Выбрать '+icon+'"')).join('')+'</div>':'');
 }
+export function timeField(name='time',label='Время',value=''){
+ const options=[['','Время не задано']];
+ for(let hour=0;hour<24;hour++)for(const minute of [0,30]){const value=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');options.push([value,value]);}
+ return field(name,label,value,'text',options);
+}
 export function toast(message){const t=document.querySelector('#toast');t.textContent=message;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),4200)}
 export function openDialog(title,body,onSubmit,wide=false){
  const d=document.querySelector('#modal');

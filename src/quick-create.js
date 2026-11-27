@@ -1,4 +1,4 @@
-import {field,escape as e,openDialog} from './ui.js?v=20261012-cloud1';
+import {field,timeField,escape as e,openDialog} from './ui.js?v=20261127-time1';
 import {newTopic,plannerState,saveTopic,platforms,validDate} from './planner-model.js?v=20261012-cloud1';
 import {uid} from './model.js?v=20261012-cloud1';
 import {icon} from './icons.js?v=20261012-cloud1';
@@ -42,18 +42,18 @@ export function quickCreate(state,u,kind,day,onSave){
    '<section class="topic-wizard-page" data-wizard-page="1"><h3>Площадки и форматы</h3><p class="small-note">Выберите нужные площадки и формат для каждой. Все варианты останутся внутри одной темы.</p><div class="platform-check-grid">'+platformChoices+'</div></section>'+
    '<section class="topic-wizard-page" data-wizard-page="2"><h3>Сроки подготовки</h3><div class="field-pair">'+field('shootDate','Дата съёмки',day||'','date')+field('publishDate','Дата публикации','','date')+'</div>'+field('deadline','Крайний срок подготовки','','date')+'<div class="wizard-info">После создания можно добавить AI-сценарий, кадры, фотографии и публикации.</div></section>';
  }
- if(kind==='shoot')body+=field('sceneTitle','Что нужно снять','','text',null,true)+field('date','Дата съёмки',day||'','date')+field('shots','Кадры / действия (необязательно)','','textarea');
- if(kind==='post')body+=field('platform','Площадка',u.channel||'','text',[['','Выберите площадку'],...Object.keys(platforms).map(p=>[p,p])],true)+'<div id="quick-format">'+field('format','Формат','','text',[['','Выберите формат'],...(platforms[u.channel]||[]).map(f=>[f,f])],true)+'</div>'+field('date','Дата публикации',day||'','date')+field('text','Текст (необязательно)','','textarea');
+ if(kind==='shoot')body+=field('sceneTitle','Что нужно снять','','text',null,true)+field('date','Дата съёмки',day||'','date')+timeField('time','Время съёмки')+field('shots','Кадры / действия (необязательно)','','textarea');
+ if(kind==='post')body+=field('platform','Площадка',u.channel||'','text',[['','Выберите площадку'],...Object.keys(platforms).map(p=>[p,p])],true)+'<div id="quick-format">'+field('format','Формат','','text',[['','Выберите формат'],...(platforms[u.channel]||[]).map(f=>[f,f])],true)+'</div>'+field('date','Дата публикации',day||'','date')+timeField('time','Время публикации')+field('text','Текст (необязательно)','','textarea');
  openDialog(labels[kind],body,async data=>{
   if(!validDate(data.date))throw Error('Проверьте дату');
   const existing=topics.find(t=>t.id===data.topicId);if(kind!=='topic'&&data.topicId&&!existing)throw Error('Тема не найдена');
-  if(kind==='shoot'&&!data.topicId){if(!data.sceneTitle?.trim())throw Error('Укажите, что нужно снять');const next=structuredClone(state);next.shoots.push({id:uid(),projId:u.projId,title:data.sceneTitle.trim(),date:data.date||'',time:'',place:'',desc:data.shots||'',status:'Запланирована'});await onSave(next,kind);return;}
+  if(kind==='shoot'&&!data.topicId){if(!data.sceneTitle?.trim())throw Error('Укажите, что нужно снять');const next=structuredClone(state);next.shoots.push({id:uid(),projId:u.projId,title:data.sceneTitle.trim(),date:data.date||'',time:data.time||'',place:'',desc:data.shots||'',status:'Запланирована'});await onSave(next,kind);return;}
   const chosenWorks=kind==='topic'?[...document.querySelectorAll('#modal input[name=workIds]:checked')].map(x=>x.value):[];
   const chosenPlatforms=kind==='topic'?[...document.querySelectorAll('#modal input[name=platforms]:checked')].map(x=>x.value):[];
   const topic=kind==='topic'?topicFromWizard(state,u,data,chosenWorks,chosenPlatforms):existing?structuredClone(existing):newTopic(u.projId);
   if(kind!=='topic'&&!existing){if(!data.newTitle?.trim())throw Error('Введите название темы');topic.title=data.newTitle.trim();topic.folderIds=u.folderId?[u.folderId]:[];}
   if(kind==='shoot'){if(!data.sceneTitle?.trim())throw Error('Укажите, что нужно снять');topic.scenes.push({id:uid(),title:data.sceneTitle.trim(),shots:data.shots||'',date:data.date||'',deadline:'',filmed:false,beforeWork:false,workIds:[]});}
-  if(kind==='post'){if(!platforms[data.platform]?.includes(data.format))throw Error('Выберите площадку и формат');topic.variants.push({id:uid(),platform:data.platform,format:data.format,date:data.date||'',text:data.text||'',ready:'Черновик',link:''});}
+  if(kind==='post'){if(!platforms[data.platform]?.includes(data.format))throw Error('Выберите площадку и формат');topic.variants.push({id:uid(),platform:data.platform,format:data.format,date:data.date||'',time:data.time||'',text:data.text||'',ready:'Черновик',link:''});}
   await onSave(saveTopic(state,topic),kind);
  });
  const dialog=document.querySelector('#modal');dialog.classList.toggle('topic-wizard-dialog',kind==='topic');dialog.querySelector('[type=submit]').textContent=kind==='topic'?'Создать тему':kind==='shoot'?'Добавить съёмку':'Добавить публикацию';
