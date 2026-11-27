@@ -139,6 +139,25 @@ body:has(.home-hero) .topbar .crumb::before{content:"TARUSOV PLANNER";font-size:
 .nav button:focus-visible,.card:focus-visible,.stat:focus-visible,.primary:focus-visible{outline:2px solid var(--brand-sand);outline-offset:3px}
 @media(max-width:780px){.top-brand{display:none}.home-hero .home-summary{position:static;display:grid;width:100%}}
 
+/* Calendar concept: clean production schedule surface. */
+.calendar-panel{background:var(--brand-white)!important;color:var(--ink)!important;border-color:var(--line)!important;padding:26px!important;box-shadow:0 18px 40px rgba(0,0,0,.16)!important}
+.calendar-panel .calendar-head{padding-bottom:18px!important;border-bottom:1px solid #d8d0c5!important;margin-bottom:0!important}
+.calendar-panel .calendar-nav h2{color:var(--ink)!important;font-size:26px!important;font-weight:800!important;letter-spacing:-.03em}
+.calendar-panel .calendar-period-icon{background:#eee8df!important;color:var(--brand-terracotta)!important;border:1px solid #d8d0c5}
+.calendar-panel .calendar-nav button,.calendar-panel .calendar-controls button,.calendar-panel .calendar-controls select{background:#fff!important;color:var(--ink)!important;border-color:#d8d0c5!important}
+.calendar-panel .calendar-controls .primary,.calendar-panel .calendar-controls button[data-action="cal-today"]{background:var(--brand-terracotta)!important;color:#fff!important;border-color:var(--brand-terracotta)!important}
+.calendar-panel .calendar-controls select{min-height:40px;border-radius:10px!important;font-weight:650}
+.calendar-panel .project-calendar-legend{padding:12px 0 16px;margin:0!important;color:var(--muted)}
+.calendar-panel .weekday{padding:13px 10px;color:#6d7476!important;font-weight:700;letter-spacing:.04em}.calendar-panel .weekday:nth-last-child(-n+2){color:#9d5639!important}
+.calendar-panel .calendar-grid{border-color:#d8d0c5!important;border-radius:12px;overflow:hidden}
+.calendar-panel .day{min-height:126px!important;padding:11px!important;background:#fff!important;border-color:#d8d0c5!important;color:var(--ink)!important;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
+.calendar-panel .day:hover{background:#fbf6ef!important;border-color:rgba(200,111,74,.55)!important;box-shadow:inset 0 0 0 1px rgba(200,111,74,.18);transform:none}
+.calendar-panel .day.outside{background:#eee8df!important;color:#8b9090!important}.calendar-panel .day.weekend{background:#fcf3eb!important}.calendar-panel .day.today{background:#fff8f2!important;border:2px solid var(--brand-terracotta)!important;padding:10px!important}
+.calendar-panel .day .day-num{font-size:14px!important;font-weight:800;color:var(--ink)!important}.calendar-panel .day.weekend .day-num{color:#a45a3b!important}.calendar-panel .day.today .day-num{background:var(--brand-terracotta)!important;color:#fff!important;border-radius:8px!important}
+.calendar-panel .event{background:#f7f3ec!important;color:var(--ink)!important;border:1px solid #d8d0c5!important;border-left:4px solid var(--project-color,var(--brand-terracotta))!important;border-radius:9px!important;padding:7px 8px!important;white-space:normal!important;line-height:1.25;box-shadow:0 2px 5px rgba(0,0,0,.06);transition:transform .16s,box-shadow .16s}
+.calendar-panel .event:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.14);border-color:var(--brand-terracotta)!important}.calendar-panel .event small{color:#6d7476!important;font-weight:700}
+@media(max-width:780px){.calendar-panel{padding:16px!important}.calendar-panel .calendar-nav h2{font-size:20px!important}.calendar-panel .day{min-height:86px!important;padding:6px!important}.calendar-panel .event{font-size:9px!important;padding:4px!important}.calendar-panel .event small{display:none}}
+
 /* Auto-hide navigation on inner sections, while keeping Home permanently open. */
 @media(min-width:781px){
   .shell:not(:has(.home-hero)){grid-template-columns:18px minmax(0,1fr)}
