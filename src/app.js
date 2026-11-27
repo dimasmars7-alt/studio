@@ -42,6 +42,9 @@ function projectPicker(value=''){
  const rows=projects.length?projects.map(p=>'<button type="button" class="project-picker-option" data-action="project-option" data-id="'+e(p.id)+'" data-project-option="'+e((p.name+' '+(state.orgs.find(o=>o.id===p.orgId)?.name||'')).toLowerCase())+'"><i style="background:'+(validColor(p.color)?p.color:'#c86f4a')+'"></i><span><strong>'+e(p.name)+'</strong><small>'+e(state.orgs.find(o=>o.id===p.orgId)?.name||'Активный проект')+'</small></span>'+(p.id===value?'<b aria-label="Выбран">✓</b>':'')+'</button>').join(''):'<p class="project-picker-empty">Активных проектов пока нет.</p>';
  return '<div class="field project-picker-field"><span class="field-label">Проект</span><input type="hidden" name="projId" value="'+e(value)+'"><details class="project-picker"><summary><i style="background:'+(selected&&validColor(selected.color)?selected.color:'#c86f4a')+'"></i><span><strong>'+e(label)+'</strong><small>'+e(meta)+'</small></span></summary><div class="project-picker-menu"><input type="search" placeholder="Найти проект" aria-label="Найти проект" data-project-search>'+rows+'</div></details></div>';
 }
+function timePicker(value=''){
+ const options=[['','Время не задано']];for(let h=0;h<24;h++)for(const m of [0,30]){const v=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');options.push([v,v]);}return field('time','Время',value,'text',options);
+}
 function entityForm(type,id=null,date=null){
  const existing=id?state[type].find(x=>x.id===id):null;
  if(id&&!existing)throw Error('Запись не найдена');
@@ -49,7 +52,7 @@ function entityForm(type,id=null,date=null){
  if(['posts','links'].includes(type)&&!state.projects.some(x=>x.id===ui.projId))throw Error('Сначала выберите проект');
  const x=existing||{},f=(name,label,value='',kind='text',options=null,required=false)=>field(name,label,x[name]??value,kind,options,required);
  let html='';
- if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+f('time','Время','','time')+'</div>'+projectPicker(x.projId||'')+f('place','Место')+f('desc','Описание','','textarea');
+ if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+timePicker(x.time||'')+'</div>'+projectPicker(x.projId||'')+f('place','Место')+f('desc','Описание','','textarea');
  else if(['orgs','projects'].includes(type))html=f('name','Название','','text',null,true)+f('emoji','Эмодзи','📁')+(type==='projects'?f('color','Цвет проекта',nextProjectColor(state.projects),'color'):'');
  else if(type==='posts')html=publicationForm(state,ui,x,platforms(state),date);
  else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']])+f('date','Срок','','date')+'</div>';
