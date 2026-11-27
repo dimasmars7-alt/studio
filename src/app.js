@@ -74,7 +74,7 @@ function entityForm(type,id=null,date=null){
  if(['posts','links'].includes(type))record.projId=existing?.projId||ui.projId;
  if(type==='tasks'){record.done=Boolean(existing?.done);record.projId=existing?.projId||ui.projId}
  const next=structuredClone(state);
- if(type==='posts'&&record.social?.startsWith('platform:')){const name=record.social.slice(9),social=platforms(state).find(v=>v.id===record.social);if(!social)throw Error('Площадка не найдена');const actual={id:uid(),name,color:'#7054d8'};next.socials.push(actual);if(ui.postSocial===record.social)ui.postSocial=actual.id;record.social=actual.id}
+ if(type==='posts'&&record.social?.startsWith('platform:')){const name=record.social.slice(9),social=platforms(state).find(v=>v.id===record.social);if(!social)throw Error('Площадка не найдена');const actual={id:uid(),name,color:'#c86f4a'};next.socials.push(actual);if(ui.postSocial===record.social)ui.postSocial=actual.id;record.social=actual.id}
  if(id)next[type]=next[type].map(v=>v.id===id?record:v);else next[type].push(record);
  const names={shoots:'Съёмка',posts:'Публикация',tasks:'Задача'};
  const messages=names[type]?(names[type]+' '+(id?'обновлена':'добавлена')):'Сохранено';

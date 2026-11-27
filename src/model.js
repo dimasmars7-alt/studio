@@ -5,7 +5,7 @@ export const dateKey=(d=new Date())=>[d.getFullYear(),String(d.getMonth()+1).pad
 export function defaults(){return {
  version:2,orgs:[],projects:[],posts:[],shoots:[],tasks:[],gear:[],portfolio:[],links:[],files:[],finances:[],
  profile:{name:'Тарусов',email:'',org:''},
- settings:{theme:'light',accent:'#7561df',fontSize:15,navWidth:236,logoSize:'large',density:'comfortable',contrast:'standard'},
+ settings:{theme:'light',accent:'#c86f4a',fontSize:15,navWidth:236,logoSize:'large',density:'comfortable',contrast:'standard'},
  rubrics:[{id:'r1',name:'Новости',emoji:'📰',color:'#28745b'}],
  socials:[{id:'s1',name:'Instagram',emoji:'📷',color:'#b15c84'}],
  statuses:[{id:'st1',name:'Черновик',color:'#9b9b93'},{id:'st2',name:'Опубликован',color:'#28745b'}],
@@ -63,7 +63,7 @@ export function normalize(raw){
  base.profile={...base.profile,...source.profile};
  for(const key of ['name','email','org'])if(typeof base.profile[key]!=='string')throw Error('Некорректный профиль');
  base.settings={...base.settings,...source.settings};
- if(!/^#[0-9a-f]{6}$/i.test(base.settings.accent))base.settings.accent='#28745b';
+ if(!/^#[0-9a-f]{6}$/i.test(base.settings.accent))base.settings.accent='#c86f4a';
  base.settings.fontSize=Math.min(19,Math.max(13,Number(base.settings.fontSize)||15));
  base.settings.navWidth=Math.min(280,Math.max(200,Number(base.settings.navWidth)||236));
  base.settings.theme=base.settings.theme==='dark'?'dark':'light';
