@@ -83,7 +83,8 @@ function shiftDate(key,direction,mode){
 }
 function appearance(){
  const s=state.settings;
- openDialog('Оформление',field('theme','Тема',s.theme,'text',[['light','Светлая'],['dark','Тёмная']])+field('accent','Цвет акцента',s.accent,'color')+field('fontSize','Размер текста',s.fontSize,'text',[[13,'Компактный'],[15,'Обычный'],[17,'Крупный'],[19,'Очень крупный']])+field('navWidth','Ширина меню',s.navWidth,'text',[[200,'Узкое'],[236,'Обычное'],[280,'Широкое']]),async data=>{const next=structuredClone(state);next.settings={...data,fontSize:Number(data.fontSize),navWidth:Number(data.navWidth)};await commit(next)});
+ const accents=[[s.accent,'Текущий цвет'],['#c86f4a','TARUSOV · Терракотовый'],['#d9b58c','TARUSOV · Тёплый песок'],['#2b3035','TARUSOV · Графит'],['#1b2a33','TARUSOV · Сине-графитовый']].filter((x,i,a)=>a.findIndex(v=>v[0]===x[0])===i);
+ openDialog('Внешний вид', '<p class="appearance-dialog-intro">Эти параметры применяются ко всему рабочему пространству на этом устройстве.</p>'+field('theme','Тема',s.theme,'text',[['light','Светлая'],['dark','Тёмная']])+field('accent','Фирменный акцент',s.accent,'text',accents)+field('fontSize','Размер текста',s.fontSize,'text',[[13,'Компактный'],[15,'Обычный'],[17,'Крупный'],[19,'Очень крупный']])+field('navWidth','Ширина бокового меню',s.navWidth,'text',[[200,'Узкое'],[236,'Обычное'],[280,'Широкое']]),async data=>{const next=structuredClone(state);next.settings={...data,fontSize:Number(data.fontSize),navWidth:Number(data.navWidth)};await commit(next)});
 }
 async function exportBackup(){
  const json=JSON.stringify({version:2,exportedAt:new Date().toISOString(),data:state},null,2);
