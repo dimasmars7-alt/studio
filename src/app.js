@@ -4,7 +4,7 @@ import {validDate} from './planner-model.js?v=20261127-brand39';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time4';
-import * as views from './views.js?v=20261127-brand41';
+import * as views from './views.js?v=20261127-brand46';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
@@ -159,7 +159,7 @@ document.addEventListener('click',async event=>{
  else if(action==='delete'){
  const text=['orgs','projects'].includes(type)?'Запись и все связанные проекты, посты, ссылки и файлы будут удалены. Продолжить?':'Удалить эту запись?';
  confirmDialog('Удаление',text,async()=>{await commit(removeEntity(state,type,id),'Запись удалена');if(type==='orgs'&&ui.orgId===id){ui.orgId='';ui.projId=''}if(type==='projects'&&ui.projId===id)ui.projId='';render()});
- }else if(action==='day'){ui.date=date;openDialog('События · '+date,views.shootList(generalShoots(state).filter(x=>x.date===date),state)+'<div class="calendar-day-actions">'+b('add','＋ Съёмка','data-type="shoots" data-date="'+date+'"','primary')+b('add','＋ Публикация','data-type="posts" data-date="'+date+'"')+b('add','＋ Задача','data-type="tasks" data-date="'+date+'"')+'</div>',null,true)}
+ }else if(action==='day'){ui.date=date;openDialog('События · '+date,views.dayEventList(state,date)+'<div class="calendar-day-actions">'+b('add','＋ Съёмка','data-type="shoots" data-date="'+date+'"','primary')+b('add','＋ Публикация','data-type="posts" data-date="'+date+'"')+b('add','＋ Задача','data-type="tasks" data-date="'+date+'"')+'</div>',null,true)}
  else if(action==='calendar-date'){ui.date=date;ui.calMode='month';navigate('cal')}
  else if(action==='calendar-year'){ui.date=year+'-01-01';ui.calMode='year';render()}
  else if(action==='cal-prev'||action==='cal-next')shiftDate('date',action==='cal-prev'?-1:1,ui.calMode);
