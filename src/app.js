@@ -1,5 +1,6 @@
 import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=20261012-cloud1';
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
+import {validDate} from './planner-model.js?v=20261127-brand39';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time3';
@@ -75,7 +76,8 @@ function entityForm(type,id=null,date=null){
  const next=structuredClone(state);
  if(type==='posts'&&record.social?.startsWith('platform:')){const name=record.social.slice(9),social=platforms(state).find(v=>v.id===record.social);if(!social)throw Error('Площадка не найдена');const actual={id:uid(),name,color:'#7054d8'};next.socials.push(actual);if(ui.postSocial===record.social)ui.postSocial=actual.id;record.social=actual.id}
  if(id)next[type]=next[type].map(v=>v.id===id?record:v);else next[type].push(record);
- const messages={shoots:id?(type==='shoots'?'Съёмка обновлена':'Сохранено'):'Съёмка добавлена',posts:id?'Публикация обновлена':'Публикация добавлена',tasks:id?'Задача обновлена':'Задача добавлена'};
+ const names={shoots:'Съёмка',posts:'Публикация',tasks:'Задача'};
+ const messages=names[type]?(names[type]+' '+(id?'обновлена':'добавлена')):'Сохранено';
  await commit(next,messages[type]||'Сохранено');
  if(type==='orgs'&&!id){ui.orgId=record.id;ui.projId='';ui.section='content';location.hash='content';render()}
  if(type==='projects'&&!id){ui.projId=record.id;ui.archive=false;render()}
