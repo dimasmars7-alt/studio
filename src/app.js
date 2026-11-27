@@ -3,7 +3,7 @@ import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './mod
 import {validDate} from './planner-model.js?v=20261127-brand39';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
-import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time3';
+import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time4';
 import * as views from './views.js?v=20261127-brand27';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time2';
@@ -64,7 +64,6 @@ function entityForm(type,id=null,date=null){
  for(const key of Object.keys(data))if(typeof data[key]==='string'&&!(type==='posts'&&key==='text'))data[key]=data[key].trim();
  for(const key of ['url','link'])if(data[key]&&!safeUrl(data[key]))throw Error('Используйте ссылку с http:// или https://');
  if(['shoots','posts','tasks'].includes(type)&&(!data.date||!validDate(data.date)))throw Error('Выберите корректную дату');
- if(type==='shoots'&&(!data.projId||!state.projects.some(x=>x.id===data.projId)))throw Error('Выберите проект');
  for(const key of ['title','name','text','desc'])if(key in data&&!data[key]&&['title','name'].includes(key))throw Error('Заполните название');
  if(type==='tasks'&&!data.text)throw Error('Введите текст задачи');
  if(type==='gear'){data.qty=Number(data.qty);data.price=Number(data.price);if(!Number.isInteger(data.qty)||data.qty<1||!Number.isFinite(data.price)||data.price<0)throw Error('Количество должно быть целым и положительным; цена — неотрицательной')}

@@ -53,7 +53,10 @@ export function openDialog(title,body,onSubmit,wide=false){
  d.querySelector('#close-dialog').onclick=closeDialog;
  const cancel=d.querySelector('#cancel-dialog');if(cancel)cancel.onclick=closeDialog;
  d.oncancel=event=>{if(!dirty||!onSubmit)return;event.preventDefault();closeDialog()};
- form.onsubmit=async e=>{if(!onSubmit)return;e.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;try{await onSubmit(Object.fromEntries(new FormData(form)));dirty=false;d.close()}catch(err){toast(err.message)}finally{submit.disabled=false}};
+ const showError=message=>{let note=form.querySelector('.dialog-error');if(!note){note=document.createElement('div');note.className='dialog-error';form.querySelector('.dialog-body')?.prepend(note)}note.textContent=message;note.hidden=false};
+ form.addEventListener('input',()=>{const note=form.querySelector('.dialog-error');if(note)note.hidden=true});
+ form.addEventListener('change',()=>{const note=form.querySelector('.dialog-error');if(note)note.hidden=true});
+ form.onsubmit=async e=>{if(!onSubmit)return;e.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;try{await onSubmit(Object.fromEntries(new FormData(form)));dirty=false;d.close()}catch(err){showError(err.message||'Не удалось сохранить запись');toast(err.message||'Не удалось сохранить запись')}finally{submit.disabled=false}};
  if(!d.open)d.showModal();
 }
 

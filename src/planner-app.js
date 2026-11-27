@@ -10,7 +10,7 @@ import {quickCreate} from './quick-create.js?v=20261127-time2';
 import {openStore,persist,backupState} from './storage.js?v=20261014-planner2';
 import {markLocalSaved} from './storage-status.js';
 import {uid,normalize,removeEntity} from './model.js?v=20261014-planner2';
-import {escape as e,field,timeField,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261127-time3';
+import {escape as e,field,timeField,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261127-time4';
 import {editor} from './planner-view.js?v=20261017-topic2';
 import {view} from './reference-view.js?v=20261018-account1';
 import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261014-planner2';

@@ -189,3 +189,4 @@ input[type=date]::-webkit-calendar-picker-indicator{display:block!important;opac
 dialog:has(.dialog-body) form{display:flex;flex-direction:column;min-height:0;max-height:inherit}dialog:has(.dialog-body) .dialog-body{max-height:calc(82vh - 150px)!important}
 dialog:not([open]){display:none!important}
 .confirm-discard-content{padding:26px 28px;min-width:min(420px,calc(100vw - 48px))}.confirm-discard-content h2{margin:0 0 10px;font-size:22px}.confirm-discard-content p{margin:0;color:var(--muted);font-size:14px}.confirm-discard-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;flex-wrap:wrap}.confirm-discard-actions .primary{min-width:190px}
+.dialog-error{margin:0 0 16px;padding:11px 13px;border:1px solid #d58a71;border-radius:10px;background:#fae8e1;color:#8d412c;font-size:13px;line-height:1.4}
