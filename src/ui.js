@@ -12,6 +12,7 @@ export function field(name,label,value='',type='text',options=null,required=fals
  let input;
  if(options)input='<select '+attrs+'>'+options.map(([v,t])=>'<option value="'+escape(v)+'" '+(String(value)===String(v)?'selected':'')+'>'+escape(t)+'</option>').join('')+'</select>';
  else if(type==='textarea')input='<textarea '+attrs+' rows="4">'+escape(value)+'</textarea>';
+ else if(type==='date')input='<span class="date-input-wrap"><input '+attrs+' type="date" value="'+escape(value)+'"><button type="button" class="date-picker-trigger" data-date-picker-trigger aria-label="Открыть календарь">▣</button></span>';
  else input='<input '+attrs+' type="'+type+'" value="'+escape(value)+'" '+(type==='number'?'min="0" step="any"':'')+'>';
  return '<label class="field">'+escape(label)+input+'</label>'+(name==='emoji'?'<div class="toolbar" aria-label="Быстрый выбор эмодзи">'+['📷','📁','🎬','📰','🏷️','💒','✨','🎒','🎨','💼','🌿','⭐'].map(icon=>button('emoji',icon,'data-emoji="'+icon+'" aria-label="Выбрать '+icon+'"')).join('')+'</div>':'');
 }
@@ -20,6 +21,12 @@ export function timeField(name='time',label='Время',value=''){
  for(let hour=0;hour<24;hour++)for(const minute of [0,30]){const value=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');options.push([value,value]);}
  return field(name,label,value,'text',options);
 }
+document.addEventListener('click',event=>{
+ const trigger=event.target.closest('[data-date-picker-trigger]');
+ if(trigger){event.preventDefault();const input=trigger.closest('.date-input-wrap')?.querySelector('input[type=date]');try{input?.showPicker?.()}catch{input?.focus()}return;}
+ const label=event.target.closest('label.field');
+ if(label&&!event.target.closest('input,select,textarea,button')){const input=label.querySelector('input[type=date]');try{input?.showPicker?.()}catch{input?.focus()}}
+});
 export function toast(message){const t=document.querySelector('#toast');t.textContent=message;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),4200)}
 export function openDialog(title,body,onSubmit,wide=false){
  const d=document.querySelector('#modal');

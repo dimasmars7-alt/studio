@@ -183,3 +183,4 @@ details>summary{cursor:pointer;list-style:none;padding:11px 14px;border:1px soli
 .calendar-add-actions{display:none!important}
 input[type=date]{appearance:auto!important;-webkit-appearance:auto!important;color-scheme:light;cursor:pointer}
 input[type=date]::-webkit-calendar-picker-indicator{display:block!important;opacity:1!important;visibility:visible!important;cursor:pointer;width:18px;height:18px}
+.date-input-wrap{display:flex;align-items:center;position:relative}.date-input-wrap input[type=date]{flex:1;min-width:0}.date-picker-trigger{width:42px;min-width:42px;min-height:42px;margin-left:-48px;padding:6px;border:0;background:transparent!important;color:var(--brand-terracotta);font-size:18px;z-index:1}.date-picker-trigger:hover{color:#9f4f31;transform:none;box-shadow:none}
