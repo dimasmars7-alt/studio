@@ -6,13 +6,13 @@ import {planScenes,scenarioText,planPreview,appendPlan,speakers} from './scenari
 import {seconds,retimeScenes} from './scene-timing.js?v=20261014-planner2';
 import {monthShift} from './content-calendar.js?v=20261014-planner2';
 import {newShot,shotFields,shotStatus,shotStatuses} from './storyboard.js?v=20261014-planner2';
-import {quickCreate} from './quick-create.js?v=20261127-time2';
+import {quickCreate} from './quick-create.js?v=20261127-shoot-hint2';
 import {openStore,persist,backupState} from './storage.js?v=20261014-planner2';
 import {markLocalSaved} from './storage-status.js';
 import {uid,normalize,removeEntity} from './model.js?v=20261014-planner2';
 import {escape as e,field,timeField,openDialog,toast,button as b,safeUrl} from './ui.js?v=20261127-time4';
 import {editor} from './planner-view.js?v=20261017-topic2';
-import {view} from './reference-view.js?v=20261018-account1';
+import {view} from './reference-view.js?v=20261127-overview2';
 import {scope,owner,scopeFolders,moveToFolder} from './folder-model.js?v=20261014-planner2';
 import {platforms,plannerState,newTopic,importLegacy,saveTopic,moscowDate,addDays,validDate} from './planner-model.js?v=20261014-planner2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261101-cloudfix';

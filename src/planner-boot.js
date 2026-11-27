@@ -11,6 +11,6 @@ if(location.protocol==='file:'){
 }else{
  navigator.serviceWorker?.register('./sw.js?v=20261101-release1',{updateViaCache:'none'}).catch(()=>{});
  window.addEventListener('error',event=>showFailure(event.error||event.message));window.addEventListener('unhandledrejection',event=>showFailure(event.reason));
- import('./planner-app.js?v=20261101-release1').catch(showFailure);
+ import('./planner-app.js?v=20261127-overview3').catch(showFailure);
 }
 
