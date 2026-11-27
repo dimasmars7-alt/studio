@@ -3,7 +3,7 @@ import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './mod
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time1';
-import * as views from './views.js?v=20261127-brand24';
+import * as views from './views.js?v=20261127-brand27';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time1';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
