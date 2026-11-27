@@ -1,4 +1,4 @@
-import {escape as e,field,timeField,button as b,badge,pretty} from './ui.js?v=20261127-time1';
+import {escape as e,field,timeField,button as b,badge,pretty} from './ui.js?v=20261127-time2';
 export function moscowDate(now=new Date()){const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now),value=type=>parts.find(x=>x.type===type).value;return value('year')+'-'+value('month')+'-'+value('day');}
 export function addDays(key,n){const d=new Date(key+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
 const statusName=(s,x)=>(s.statuses.find(v=>v.id===x.status)?.name||'').trim();

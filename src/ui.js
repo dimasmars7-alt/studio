@@ -17,9 +17,10 @@ export function field(name,label,value='',type='text',options=null,required=fals
  return '<label class="field">'+escape(label)+input+'</label>'+(name==='emoji'?'<div class="toolbar" aria-label="Быстрый выбор эмодзи">'+['📷','📁','🎬','📰','🏷️','💒','✨','🎒','🎨','💼','🌿','⭐'].map(icon=>button('emoji',icon,'data-emoji="'+icon+'" aria-label="Выбрать '+icon+'"')).join('')+'</div>':'');
 }
 export function timeField(name='time',label='Время',value=''){
- const options=[['','Время не задано']];
- for(let hour=0;hour<24;hour++)for(const minute of [0,30]){const value=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');options.push([value,value]);}
- return field(name,label,value,'text',options);
+ const quick=[['09:00','Утро — 09:00'],['14:00','День — 14:00'],['19:00','Вечер — 19:00']],quickValues=new Set(quick.map(([v])=>v)),exact=[];
+ for(let hour=0;hour<24;hour++)for(const minute of [0,30]){const time=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');if(!quickValues.has(time))exact.push([time,time]);}
+ const option=([v,t])=>'<option value="'+escape(v)+'" '+(String(value)===String(v)?'selected':'')+'>'+escape(t)+'</option>';
+ return '<label class="field">'+escape(label)+'<select name="'+escape(name)+'"><option value="" '+(!value?'selected':'')+'>Время не задано</option><optgroup label="Быстрый выбор">'+quick.map(option).join('')+'</optgroup><optgroup label="Точное время">'+exact.map(option).join('')+'</optgroup></select></label>';
 }
 document.addEventListener('click',event=>{
  const trigger=event.target.closest('[data-date-picker-trigger]');
@@ -32,10 +33,15 @@ export function openDialog(title,body,onSubmit,wide=false){
  const d=document.querySelector('#modal');
  d.className=wide?'wide':'';
  d.innerHTML='<form method="dialog"><header><div><span class="eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО</span><h2>'+escape(title)+'</h2></div><button type="button" class="icon-btn" aria-label="Закрыть" id="close-dialog">×</button></header><div class="dialog-body">'+body+'</div>'+(onSubmit?'<footer><button type="button" id="cancel-dialog">Отмена</button><button class="primary" type="submit">Сохранить</button></footer>':'')+'</form>';
- d.querySelector('#close-dialog').onclick=()=>d.close();
- const cancel=d.querySelector('#cancel-dialog');if(cancel)cancel.onclick=()=>d.close();
  const form=d.querySelector('form');
- form.onsubmit=async e=>{if(!onSubmit)return;e.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;try{await onSubmit(Object.fromEntries(new FormData(form)));d.close()}catch(err){toast(err.message)}finally{submit.disabled=false}};
+ let dirty=false;
+ const closeDialog=()=>{if(dirty&&onSubmit&&!window.confirm('Закрыть без сохранения?'))return;dirty=false;d.close()};
+ form.addEventListener('input',()=>{dirty=true});
+ form.addEventListener('change',()=>{dirty=true});
+ d.querySelector('#close-dialog').onclick=closeDialog;
+ const cancel=d.querySelector('#cancel-dialog');if(cancel)cancel.onclick=closeDialog;
+ d.oncancel=event=>{if(!dirty||!onSubmit)return;event.preventDefault();closeDialog()};
+ form.onsubmit=async e=>{if(!onSubmit)return;e.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;try{await onSubmit(Object.fromEntries(new FormData(form)));dirty=false;d.close()}catch(err){toast(err.message)}finally{submit.disabled=false}};
  if(!d.open)d.showModal();
 }
 

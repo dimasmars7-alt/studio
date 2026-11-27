@@ -2,10 +2,10 @@ import {generalShoots,nextProjectColor,validColor} from './project-colors.js?v=2
 import {defaults,uid,dateKey,normalize,removeEntity,diagnose,repair} from './model.js?v=20261012-cloud1';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
-import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time1';
+import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time2';
 import * as views from './views.js?v=20261127-brand27';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
-import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time1';
+import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
 import {handleCloudAction} from './cloud-ui.js?v=20261019-public1';
 let state,busy=false;
@@ -74,7 +74,8 @@ function entityForm(type,id=null,date=null){
  const next=structuredClone(state);
  if(type==='posts'&&record.social?.startsWith('platform:')){const name=record.social.slice(9),social=platforms(state).find(v=>v.id===record.social);if(!social)throw Error('Площадка не найдена');const actual={id:uid(),name,color:'#7054d8'};next.socials.push(actual);if(ui.postSocial===record.social)ui.postSocial=actual.id;record.social=actual.id}
  if(id)next[type]=next[type].map(v=>v.id===id?record:v);else next[type].push(record);
- await commit(next);
+ const messages={shoots:id?(type==='shoots'?'Съёмка обновлена':'Сохранено'):'Съёмка добавлена',posts:id?'Публикация обновлена':'Публикация добавлена',tasks:id?'Задача обновлена':'Задача добавлена'};
+ await commit(next,messages[type]||'Сохранено');
  if(type==='orgs'&&!id){ui.orgId=record.id;ui.projId='';ui.section='content';location.hash='content';render()}
  if(type==='projects'&&!id){ui.projId=record.id;ui.archive=false;render()}
  });
