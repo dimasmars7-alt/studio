@@ -133,6 +133,7 @@ document.addEventListener('click',async event=>{const dateCell=event.target.clos
  else if(action==='variant-preview'){const v=u.draft.variants.find(x=>x.id===id);if(v)openDialog('Предпросмотр · '+(v.platform||'Публикация'),'<div class="tev-preview"><h3>'+e(v.title||u.draft.title)+'</h3><p>'+e(v.text||'Текст пока не добавлен').replace(/\n/g,'<br>')+'</p><small>'+e([v.platform,v.format,v.date].filter(Boolean).join(' · '))+'</small></div>',null,true);}
  else if(action==='script-start')startScript();
  else if(action==='script-source'){u.scriptSource=btn.dataset.source==='pdf'?'pdf':'questions';render();}
+ else if(action==='org-choose'){guard(()=>{const org=state.orgs.find(x=>x.id===id);if(!org)return;u.orgId=org.id;u.projId='';u.folderId='';u.channel='';u.scriptTopic='';render();});}
  else if(action==='project-choose'){guard(()=>{const project=state.projects.find(x=>x.id===id&&x.orgId===u.orgId&&!x.archived);if(!project)return;u.projId=project.id;u.folderId='';u.channel='';u.scriptTopic='';document.querySelector('.project-picker')?.removeAttribute('open');render();});}
  else if(action==='table-filter'){u.tableFilter=btn.dataset.filter||'all';render();}
  else if(action==='quick-create')startQuick(btn.dataset.kind,btn.dataset.day||'');
