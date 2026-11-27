@@ -4,7 +4,7 @@ import {validDate} from './planner-model.js?v=20261127-brand39';
 import {openStore,persist,backupState} from './storage.js?v=20261127-brand24';
 import {markLocalSaved} from './storage-status.js';
 import {escape as e,field,timeField,openDialog,toast,safeUrl,button as b,empty} from './ui.js?v=20261127-time4';
-import * as views from './views.js?v=20261127-brand27';
+import * as views from './views.js?v=20261127-brand41';
 import {content,platforms,selectedPosts} from './content.js?v=20261012-cloud1';
 import {publicationForm,templates,moscowDate} from './planning.js?v=20261127-time2';
 import {cloudInitialize,queueCloudSync,hydrateCloudImages,resolveCloudMediaUrl} from './cloud-sync.js?v=20261019-public1';
@@ -54,7 +54,7 @@ function entityForm(type,id=null,date=null){
  if(type==='shoots')html=f('title','Название','','text',null,true)+'<div class="form-grid">'+f('date','Дата',date||ui.date,'date',null,true)+timeField('time','Время',x.time||'')+'</div>'+projectPicker(x.projId||ui.projId)+f('place','Место')+f('desc','Описание','','textarea');
  else if(['orgs','projects'].includes(type))html=f('name','Название','','text',null,true)+f('emoji','Эмодзи','📁')+(type==='projects'?f('color','Цвет проекта',nextProjectColor(state.projects),'color'):'');
  else if(type==='posts')html=publicationForm(state,ui,x,platforms(state),date);
- else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('date','Дата задачи',date||'','date',null,true)+timeField('time','Время',x.time||'')+'</div>'+f('priority','Приоритет','medium','text',[['low','Низкий'],['medium','Средний'],['high','Высокий']]);
+ else if(type==='tasks')html=f('text','Задача','','text',null,true)+'<div class="form-grid">'+f('date','Дата задачи',date||'','date',null,true)+timeField('time','Время',x.time||'')+'</div>'+'<label class="field priority-field"><span>Приоритет</span><select name="priority" class="priority-select priority-'+e(x.priority||'medium')+'"><option value="low" '+(x.priority==='low'?'selected':'')+'>Низкий</option><option value="medium" '+((x.priority||'medium')==='medium'?'selected':'')+'>Средний</option><option value="high" '+(x.priority==='high'?'selected':'')+'>Высокий</option></select></label>';
  else if(type==='gear')html=f('name','Название','','text',null,true)+f('catId','Категория','','text',choices('gearCats'))+'<div class="form-grid">'+f('qty','Количество',1,'number',null,true)+f('price','Цена за единицу, ₽',0,'number',null,true)+'</div>';
  else if(type==='portfolio')html=f('name','Название работы','','text',null,true)+f('catId','Категория','','text',choices('portCats'))+f('link','Ссылка на работу','','url');
  else if(type==='links')html=f('name','Название','','text',null,true)+f('url','URL','','url',null,true);
@@ -81,6 +81,7 @@ function entityForm(type,id=null,date=null){
  if(type==='orgs'&&!id){ui.orgId=record.id;ui.projId='';ui.section='content';location.hash='content';render()}
  if(type==='projects'&&!id){ui.projId=record.id;ui.archive=false;render()}
  });
+ if(type==='tasks'){const priority=$('#modal [name=priority]');if(priority)priority.addEventListener('change',()=>{priority.className='priority-select priority-'+priority.value})}
 }
 function confirmDialog(title,text,callback){
  openDialog(title,'<p>'+e(text)+'</p>',callback);
