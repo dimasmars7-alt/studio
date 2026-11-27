@@ -12,7 +12,7 @@ export function field(name,label,value='',type='text',options=null,required=fals
  let input;
  if(options)input='<select '+attrs+'>'+options.map(([v,t])=>'<option value="'+escape(v)+'" '+(String(value)===String(v)?'selected':'')+'>'+escape(t)+'</option>').join('')+'</select>';
  else if(type==='textarea')input='<textarea '+attrs+' rows="4">'+escape(value)+'</textarea>';
- else if(type==='date')input='<span class="date-input-wrap"><input '+attrs+' type="date" value="'+escape(value)+'"><button type="button" class="date-picker-trigger" data-date-picker-trigger aria-label="Открыть календарь">▣</button></span>';
+ else if(type==='date')input='<span class="date-input-wrap"><input '+attrs+' type="date" value="'+escape(value)+'"><button type="button" class="date-picker-trigger" data-date-picker-trigger aria-label="Открыть календарь">'+icon('cal')+'</button></span>';
  else input='<input '+attrs+' type="'+type+'" value="'+escape(value)+'" '+(type==='number'?'min="0" step="any"':'')+'>';
  return '<label class="field">'+escape(label)+input+'</label>'+(name==='emoji'?'<div class="toolbar" aria-label="Быстрый выбор эмодзи">'+['📷','📁','🎬','📰','🏷️','💒','✨','🎒','🎨','💼','🌿','⭐'].map(icon=>button('emoji',icon,'data-emoji="'+icon+'" aria-label="Выбрать '+icon+'"')).join('')+'</div>':'');
 }
