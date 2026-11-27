@@ -5,7 +5,7 @@ export const dateKey=(d=new Date())=>[d.getFullYear(),String(d.getMonth()+1).pad
 export function defaults(){return {
  version:2,orgs:[],projects:[],posts:[],shoots:[],tasks:[],gear:[],portfolio:[],links:[],files:[],finances:[],
  profile:{name:'Тарусов',email:'',org:''},
- settings:{theme:'light',accent:'#7561df',fontSize:15,navWidth:236},
+ settings:{theme:'light',accent:'#7561df',fontSize:15,navWidth:236,logoSize:'large',density:'comfortable',contrast:'standard'},
  rubrics:[{id:'r1',name:'Новости',emoji:'📰',color:'#28745b'}],
  socials:[{id:'s1',name:'Instagram',emoji:'📷',color:'#b15c84'}],
  statuses:[{id:'st1',name:'Черновик',color:'#9b9b93'},{id:'st2',name:'Опубликован',color:'#28745b'}],
@@ -67,6 +67,9 @@ export function normalize(raw){
  base.settings.fontSize=Math.min(19,Math.max(13,Number(base.settings.fontSize)||15));
  base.settings.navWidth=Math.min(280,Math.max(200,Number(base.settings.navWidth)||236));
  base.settings.theme=base.settings.theme==='dark'?'dark':'light';
+ base.settings.logoSize=['compact','standard','large'].includes(base.settings.logoSize)?base.settings.logoSize:'large';
+ base.settings.density=['compact','comfortable','spacious'].includes(base.settings.density)?base.settings.density:'comfortable';
+ base.settings.contrast=base.settings.contrast==='high'?'high':'standard';
  for(const g of base.gear){g.qty=Math.max(1,Number(g.qty)||1);g.price=Math.max(0,Number(g.price)||0)}
  for(const f of base.finances)f.amount=Math.max(0,Number(f.amount)||0);
  ensureProjectColors(base);
