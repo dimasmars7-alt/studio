@@ -1,0 +1,119 @@
+name: REG.RU — предпросмотр Planner
+
+on:
+  push:
+    branches: [feature/planner-009-full-brand-migration]
+    paths:
+      - '.github/workflows/reg-ru-preview.yml'
+      - 'index.html'
+      - 'planner.html'
+      - 'public.html'
+      - 'manifest.json'
+      - 'sw.js'
+      - '.htaccess'
+      - 'icon-192.png'
+      - 'icon-512.png'
+      - 'src/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reg-ru-planner-preview
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: Обновить предпросмотр
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      HOST: 37.140.192.52
+      HOST_USER: u3671990
+      HOST_FINGERPRINT: SHA256:o4j9KqVohji4n1Lx/0+Ao+4B9tqGd3O8VwRCpPFcHaA
+      SITE_DIR: /var/www/u3671990/data/www/tarusovphotographer.online/preview/planner-009
+      PREVIEW_URL: https://tarusovphotographer.online/preview/planner-009/
+    steps:
+      - name: Получить файлы из GitHub
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Подготовить защищённое подключение
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SSH_PRIVATE_KEY" || { echo 'Добавьте секрет REG_SSH_KEY в настройках репозитория'; exit 1; }
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/reg_studio_key"
+          ssh-keygen -y -P '' -f "$HOME/.ssh/reg_studio_key" > /dev/null
+          ssh-keyscan -T 20 -p 22 -t ed25519 "$HOST" > "$HOME/.ssh/reg_scan" 2>/dev/null
+          actual=$(ssh-keygen -lf "$HOME/.ssh/reg_scan" -E sha256 | awk '{print $2}' | sort -u)
+          test "$actual" = "$HOST_FINGERPRINT"
+          cp "$HOME/.ssh/reg_scan" "$HOME/.ssh/reg_known_hosts"
+          cat > "$HOME/.ssh/config" <<EOF
+          Host reg-studio
+            HostName $HOST
+            User $HOST_USER
+            Port 22
+            IdentityFile $HOME/.ssh/reg_studio_key
+            UserKnownHostsFile $HOME/.ssh/reg_known_hosts
+            StrictHostKeyChecking yes
+            IdentitiesOnly yes
+            BatchMode yes
+            ConnectTimeout 20
+          EOF
+
+      - name: Проверить preview-папку
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -T reg-studio 'set -eu
+            root=/var/www/u3671990/data/www/tarusovphotographer.online
+            target=/var/www/u3671990/data/www/tarusovphotographer.online/preview/planner-009
+            test "$(realpath "$root")" = "$root"
+            mkdir -p "$target"
+            test "$(realpath "$target")" = "$target"
+            command -v rsync >/dev/null
+            command -v sha256sum >/dev/null'
+
+      - name: Подготовить файлы предпросмотра
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/site"
+          for file in .htaccess index.html planner.html public.html manifest.json sw.js icon-192.png icon-512.png; do
+            test -f "$file"
+            cp "$file" "$RUNNER_TEMP/site/"
+          done
+          cp -R src "$RUNNER_TEMP/site/src"
+          test -z "$(find "$RUNNER_TEMP/site" -type l -print)"
+          (cd "$RUNNER_TEMP/site" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUNNER_TEMP/site-sha256.txt"
+
+      - name: Создать резервную копию preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -T reg-studio 'set -eu
+            umask 077
+            target=/var/www/u3671990/data/www/tarusovphotographer.online/preview/planner-009
+            mkdir -p "$HOME/.studio-backups"
+            backup="$HOME/.studio-backups/planner-preview-$(date -u +%Y%m%dT%H%M%S)-$$.tar.gz"
+            tar -czf "$backup" -C "$target" .
+            printf "Preview backup: %s\n" "$backup"'
+
+      - name: Загрузить preview и проверить контрольные суммы
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -rc --delay-updates --chmod=D755,F644 -e ssh "$RUNNER_TEMP/site/" "reg-studio:$SITE_DIR/"
+          ssh -T reg-studio "cd '$SITE_DIR' && sha256sum -c -" < "$RUNNER_TEMP/site-sha256.txt"
+          echo "Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Удалить временный ключ
+        if: always()
+        shell: bash
+        run: rm -f "$HOME/.ssh/reg_studio_key"
