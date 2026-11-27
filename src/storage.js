@@ -25,8 +25,9 @@ export function persist(state){
 export function backupState(state,reason='Перед изменением'){
  return new Promise((resolve,reject)=>{
   if(!db||!db.objectStoreNames.contains('backups'))return resolve();
-  const tx=db.transaction('backups','readwrite'),key=Date.now();
-  tx.objectStore('backups').put({state:structuredClone(state),reason,createdAt:new Date(key).toISOString()},key);
-  tx.oncomplete=()=>resolve(key);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Не удалось создать резервную копию'));
+  const tx=db.transaction('backups','readwrite');
+  const backupKey=Date.now();
+  tx.objectStore('backups').put({state:structuredClone(state),reason,createdAt:new Date(backupKey).toISOString()},backupKey);
+  tx.oncomplete=()=>resolve(backupKey);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Не удалось создать резервную копию'));
  });
 }
