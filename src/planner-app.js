@@ -135,6 +135,7 @@ document.addEventListener('click',async event=>{const dateCell=event.target.clos
  else if(action==='script-source'){u.scriptSource=btn.dataset.source==='pdf'?'pdf':'questions';render();}
  else if(action==='org-choose'){guard(()=>{const org=state.orgs.find(x=>x.id===id);if(!org)return;u.orgId=org.id;u.projId='';u.folderId='';u.channel='';u.scriptTopic='';render();});}
  else if(action==='project-choose'){guard(()=>{const project=state.projects.find(x=>x.id===id&&x.orgId===u.orgId&&!x.archived);if(!project)return;u.projId=project.id;u.folderId='';u.channel='';u.scriptTopic='';document.querySelector('.project-picker')?.removeAttribute('open');render();});}
+ else if(action==='project-filter'){u.projectFilter=btn.dataset.filter||'all';render();document.querySelector('.project-picker')?.setAttribute('open','');}
  else if(action==='table-filter'){u.tableFilter=btn.dataset.filter||'all';render();}
  else if(action==='quick-create')startQuick(btn.dataset.kind,btn.dataset.day||'');
  else if(action==='day-create')dayActions(btn.dataset.day);
@@ -244,5 +245,6 @@ document.addEventListener('click',event=>{const a=event.target.closest('a[href]'
 addEventListener('planner-cloud-auth',()=>state&&render());addEventListener('planner-cloud-sync',()=>state&&render());addEventListener('planner-storage-status',()=>state&&render());
 
 document.addEventListener('keydown',event=>{const node=event.target.closest('[role=tab][data-action=editor-tab]');if(!node||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=[...node.closest('[role=tablist]').querySelectorAll('[role=tab]')],i=tabs.indexOf(node),target=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[target].click();});
+document.addEventListener('input',event=>{const el=event.target;if(!el.classList.contains('project-picker-search'))return;const q=el.value.toLowerCase().trim();document.querySelectorAll('.project-picker-card').forEach(card=>{card.hidden=!card.dataset.projectSearch.includes(q);});});
 
 
